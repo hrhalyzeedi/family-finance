@@ -1546,7 +1546,7 @@ if(!isOnline)document.getElementById('offline-bar').style.display='flex';
 
 // Register Service Worker
 if('serviceWorker' in navigator){
-  navigator.serviceWorker.register('sw.js')
+  navigator.serviceWorker.register('/family-finance/sw.js')
     .then(r=>console.log('SW:',r.scope))
     .catch(e=>console.warn('SW:',e));
 }
