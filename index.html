@@ -17,6 +17,56 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <style>
+
+/* ══════════════════ LOGIN SCREEN ══════════════════ */
+#login-screen{position:fixed;inset:0;z-index:9000;background:linear-gradient(145deg,#2C4A6E,#4F7CAC);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px 24px}
+.login-logo{width:88px;height:88px;border-radius:50%;background:rgba(255,255,255,.15);display:flex;align-items:center;justify-content:center;margin-bottom:18px;border:3px solid rgba(255,255,255,.3)}
+.login-logo i{font-size:40px;color:#fff}
+.login-title{color:#fff;font-size:22px;font-weight:900;margin-bottom:6px;text-align:center}
+.login-sub{color:rgba(255,255,255,.7);font-size:13px;margin-bottom:32px;text-align:center}
+.login-card{background:#fff;border-radius:20px;padding:24px;width:100%;max-width:360px;box-shadow:0 12px 40px rgba(0,0,0,.25)}
+.login-card .fl{font-size:12px;font-weight:700;color:var(--text2);margin-bottom:6px;display:block}
+.login-inp{width:100%;border:1.5px solid var(--border);border-radius:12px;padding:12px 42px 12px 14px;font-size:15px;font-family:'Cairo',sans-serif;color:var(--text);outline:none;transition:border-color .2s;background:var(--surface2)}
+.login-inp:focus{border-color:var(--primary);background:#fff}
+.login-inp-wrap{position:relative;margin-bottom:16px}
+.login-inp-wrap i{position:absolute;left:13px;top:50%;transform:translateY(-50%);color:var(--text3);font-size:16px;cursor:pointer}
+.login-btn{width:100%;background:var(--primary);color:#fff;border:none;border-radius:13px;padding:14px;font-size:15px;font-weight:700;font-family:'Cairo',sans-serif;cursor:pointer;box-shadow:0 4px 16px rgba(79,124,172,.35);margin-top:4px}
+.login-err{color:var(--red);font-size:12px;font-weight:600;text-align:center;margin-top:10px;min-height:18px}
+.login-hint{color:var(--text3);font-size:11px;text-align:center;margin-top:14px;line-height:1.6}
+
+/* ══════════════════ EDIT TX SHEET ══════════════════ */
+.edit-tx-row{display:flex;align-items:center;gap:8px;padding:10px 14px;border-bottom:1px solid var(--border)}
+.edit-tx-row:last-child{border-bottom:none}
+.etx-info{flex:1}
+.etx-nm{font-size:12px;font-weight:600}
+.etx-dt{font-size:10px;color:var(--text3)}
+
+/* ══════════════════ PDF PRINT ══════════════════ */
+#pdf-preview{display:none;position:fixed;inset:0;z-index:8000;background:#f5f5f5;overflow-y:auto}
+#pdf-preview .pdf-toolbar{background:var(--primary);padding:12px 16px;display:flex;align-items:center;gap:10px;position:sticky;top:0;z-index:1}
+#pdf-preview .pdf-toolbar button{background:rgba(255,255,255,.2);color:#fff;border:1px solid rgba(255,255,255,.4);border-radius:9px;padding:8px 16px;font-size:13px;font-weight:700;font-family:'Cairo',sans-serif;cursor:pointer}
+#pdf-preview .pdf-toolbar .close-pdf{margin-right:auto;background:rgba(255,255,255,.15)}
+#pdf-page{background:#fff;max-width:794px;margin:16px auto;padding:40px;box-shadow:0 2px 16px rgba(0,0,0,.12);border-radius:8px;font-family:'Cairo',sans-serif;direction:rtl}
+@media print{
+  body > *:not(#pdf-preview){display:none !important}
+  #pdf-preview{position:static !important;background:#fff !important;overflow:visible !important}
+  #pdf-preview .pdf-toolbar{display:none !important}
+  #pdf-page{box-shadow:none !important;margin:0 !important;padding:20px !important;border-radius:0 !important}
+}
+.pdf-header{text-align:center;margin-bottom:28px;padding-bottom:18px;border-bottom:2px solid #4F7CAC}
+.pdf-header h1{font-size:20px;font-weight:900;color:#2C4A6E;margin-bottom:4px}
+.pdf-header p{font-size:12px;color:#666}
+.pdf-section-title{font-size:14px;font-weight:800;color:#2C4A6E;margin:20px 0 10px;padding:6px 12px;background:#EEF2F7;border-radius:6px;border-right:4px solid #4F7CAC}
+.pdf-table{width:100%;border-collapse:collapse;font-size:12px;margin-bottom:20px}
+.pdf-table th{background:#2C4A6E;color:#fff;padding:9px 10px;text-align:right;font-weight:700}
+.pdf-table td{padding:8px 10px;text-align:right;border-bottom:1px solid #E4EAF2}
+.pdf-table tr:nth-child(even) td{background:#F7F9FC}
+.pdf-stat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px}
+.pdf-stat{border:1.5px solid #E4EAF2;border-radius:8px;padding:14px;text-align:center}
+.pdf-stat-val{font-size:18px;font-weight:800;color:#4F7CAC}
+.pdf-stat-lbl{font-size:11px;color:#666;margin-top:3px}
+.pdf-footer{text-align:center;font-size:10px;color:#999;margin-top:28px;padding-top:14px;border-top:1px solid #E4EAF2}
+
 /* ══════════════════ VARIABLES ══════════════════ */
 :root{
   --bg:#EEF2F7;--surface:#FFF;--surface2:#F7F9FC;
@@ -258,6 +308,34 @@ button,input,select,textarea{font-family:'Cairo',sans-serif}
 </head>
 <body>
 
+
+<!-- ════ LOGIN SCREEN ════ -->
+<div id="login-screen">
+  <div class="login-logo"><i class="fas fa-landmark"></i></div>
+  <div class="login-title">الجمعية المالية الأسرية</div>
+  <div class="login-sub">سلطنة عُمان • الدخول الآمن</div>
+  <div class="login-card">
+    <label class="fl">كلمة المرور</label>
+    <div class="login-inp-wrap">
+      <input class="login-inp" id="login-pwd" type="password" placeholder="أدخل كلمة المرور" onkeydown="if(event.key==='Enter')doLogin()">
+      <i class="fas fa-eye" id="pwd-eye" onclick="togglePwd()"></i>
+    </div>
+    <button class="login-btn" onclick="doLogin()">دخول</button>
+    <div class="login-err" id="login-err"></div>
+    <div class="login-hint">كلمة المرور الافتراضية: <b>1234</b><br>يمكن تغييرها من الإعدادات</div>
+  </div>
+</div>
+
+<!-- ════ PDF PREVIEW ════ -->
+<div id="pdf-preview">
+  <div class="pdf-toolbar">
+    <button onclick="window.print()"><i class="fas fa-print" style="margin-left:6px"></i>طباعة</button>
+    <button onclick="downloadPDF()"><i class="fas fa-download" style="margin-left:6px"></i>تحميل PDF</button>
+    <button class="close-pdf" onclick="closePDF()"><i class="fas fa-times" style="margin-left:6px"></i>إغلاق</button>
+  </div>
+  <div id="pdf-page"></div>
+</div>
+
 <div id="offline-bar"><i class="fas fa-wifi-slash"></i> وضع عدم الاتصال — البيانات محفوظة محلياً</div>
 <div id="toast"></div>
 
@@ -365,6 +443,11 @@ button,input,select,textarea{font-family:'Cairo',sans-serif}
   <div class="screen" id="s-reports">
     <div class="sub-ph"><h1>التقارير المالية</h1><p>إحصائيات وكشوفات الجمعية</p></div>
     <div style="padding:12px 16px 0">
+      <div style="display:flex;gap:8px;margin-bottom:10px">
+        <button onclick="openPDF('full')" style="flex:1;background:var(--red-bg);color:var(--red);border:1.5px solid var(--red);border-radius:11px;padding:10px;font-size:12px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:5px"><i class="fas fa-file-pdf"></i> تقرير شامل</button>
+        <button onclick="openPDF('member')" style="flex:1;background:var(--primary-l);color:var(--primary);border:1.5px solid var(--primary);border-radius:11px;padding:10px;font-size:12px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:5px"><i class="fas fa-user"></i> كشف مساهم</button>
+        <button onclick="openPDF('monthly')" style="flex:1;background:var(--amber-bg);color:var(--amber);border:1.5px solid var(--amber);border-radius:11px;padding:10px;font-size:12px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:5px"><i class="fas fa-calendar"></i> شهري</button>
+      </div>
       <div class="tab-row">
         <button class="tab-b act" onclick="showRT('ov',this)">نظرة عامة</button>
         <button class="tab-b" onclick="showRT('mem',this)">المساهمون</button>
@@ -484,6 +567,12 @@ button,input,select,textarea{font-family:'Cairo',sans-serif}
           <input type="file" id="import-file" accept=".json" style="display:none" onchange="handleImport(event)">
         </div>
       </div>
+      <div class="cfg-sec">
+        <div class="cfg-hdr">الأمان</div>
+        <div style="padding:12px 15px">
+          <button onclick="openSheet('ov-chpwd')" style="width:100%;background:var(--purple-bg);color:var(--purple);border:none;border-radius:11px;padding:12px;font-size:13px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:7px"><i class="fas fa-key"></i>تغيير كلمة المرور</button>
+        </div>
+      </div>
       <div class="cfg-sec" style="border:1.5px solid var(--red-bg)">
         <div class="cfg-hdr" style="background:var(--red-bg);color:var(--red)">⚠️ منطقة الخطر</div>
         <div style="padding:13px 15px">
@@ -491,7 +580,8 @@ button,input,select,textarea{font-family:'Cairo',sans-serif}
           <button onclick="openSheet('ov-reset')" style="width:100%;background:var(--red);color:#fff;border:none;border-radius:11px;padding:13px;font-size:14px;font-weight:700;cursor:pointer;box-shadow:0 4px 14px rgba(224,122,95,.35)"><i class="fas fa-trash-alt" style="margin-left:7px"></i>مسح جميع البيانات</button>
         </div>
       </div>
-      <div style="text-align:center;padding:16px 0 6px;color:var(--text3);font-size:10px">الجمعية المالية الأسرية • سلطنة عُمان • v2.0</div>
+      <button onclick="doLogout()" style="width:100%;background:transparent;border:1.5px solid var(--border);border-radius:11px;padding:12px;font-size:13px;font-weight:700;color:var(--text2);cursor:pointer;margin-bottom:12px;display:flex;align-items:center;justify-content:center;gap:7px"><i class="fas fa-sign-out-alt"></i>تسجيل الخروج</button>
+      <div style="text-align:center;padding:8px 0 6px;color:var(--text3);font-size:10px">الجمعية المالية الأسرية • سلطنة عُمان • v3.0</div>
     </div>
   </div>
 
@@ -512,6 +602,49 @@ button,input,select,textarea{font-family:'Cairo',sans-serif}
 <button id="main-add-btn" onclick="openSheet('ov-fab')" style="position:fixed;bottom:calc(72px + 14px);left:20px;width:56px;height:56px;border-radius:50%;background:#4F7CAC;color:#fff;border:none;font-size:28px;font-weight:300;cursor:pointer;box-shadow:0 4px 20px rgba(79,124,172,.45);display:flex;align-items:center;justify-content:center;z-index:9999;line-height:1;font-family:sans-serif">+</button>
 
 <!-- ════ OVERLAYS ════ -->
+
+<!-- Edit Transaction -->
+<div class="ov" id="ov-edittx" onclick="if(event.target===this)closeSheet('ov-edittx')">
+ <div class="sheet">
+  <div class="sh"></div>
+  <div class="shdr"><div class="shtitle">تعديل المعاملة</div><button class="shclose" onclick="closeSheet('ov-edittx')"><i class="fas fa-times"></i></button></div>
+  <div class="sbody">
+   <div class="fg"><label class="fl">نوع المعاملة</label>
+    <div class="type-sel">
+     <button class="tb sd" id="et-dep" onclick="selETT('deposit')">💚 إيداع</button>
+     <button class="tb" id="et-wd"  onclick="selETT('withdraw')">🔴 سحب / قرض</button>
+    </div>
+   </div>
+   <div class="fg"><label class="fl">المساهم *</label><select class="fs" id="et-member"></select></div>
+   <div class="frow">
+    <div class="fg"><label class="fl">المبلغ (ر.ع) *</label><input class="fi" id="et-amt" type="number" placeholder="0.000" step="0.001" min="0"></div>
+    <div class="fg"><label class="fl">التاريخ *</label><input class="fi fs" id="et-date" type="date"></div>
+   </div>
+   <div class="fg"><label class="fl">ملاحظة</label><input class="fi" id="et-note" placeholder="وصف اختياري..."></div>
+   <input type="hidden" id="et-id">
+   <div class="brow">
+    <button class="btn-p a" onclick="saveEditTx()"><i class="fas fa-save" style="margin-left:6px"></i>حفظ التعديلات</button>
+    <button class="btn-o" onclick="closeSheet('ov-edittx')">إلغاء</button>
+   </div>
+  </div>
+ </div>
+</div>
+
+<!-- Change Password -->
+<div class="ov" id="ov-chpwd" onclick="if(event.target===this)closeSheet('ov-chpwd')">
+ <div class="sheet">
+  <div class="sh"></div>
+  <div class="shdr"><div class="shtitle">تغيير كلمة المرور</div><button class="shclose" onclick="closeSheet('ov-chpwd')"><i class="fas fa-times"></i></button></div>
+  <div class="sbody">
+   <div class="fg"><label class="fl">كلمة المرور الحالية</label><input class="fi" id="cp-old" type="password" placeholder="••••"></div>
+   <div class="fg"><label class="fl">كلمة المرور الجديدة</label><input class="fi" id="cp-new" type="password" placeholder="••••"></div>
+   <div class="fg"><label class="fl">تأكيد كلمة المرور الجديدة</label><input class="fi" id="cp-con" type="password" placeholder="••••"></div>
+   <div class="login-err" id="cp-err" style="text-align:right;margin:0 0 10px"></div>
+   <button class="btn-p" onclick="changePassword()">حفظ كلمة المرور الجديدة</button>
+  </div>
+ </div>
+</div>
+
 
 <!-- FAB Menu -->
 <div class="ov" id="ov-fab" onclick="if(event.target===this)closeSheet('ov-fab')">
@@ -630,12 +763,13 @@ button,input,select,textarea{font-family:'Cairo',sans-serif}
 //  FIREBASE CONFIG  — ضع إعداداتك هنا
 // ═══════════════════════════════════════════════
 const FB_CFG = {
-  apiKey:            "YOUR_API_KEY",
-  authDomain:        "YOUR_PROJECT.firebaseapp.com",
-  projectId:         "YOUR_PROJECT_ID",
-  storageBucket:     "YOUR_PROJECT.appspot.com",
-  messagingSenderId: "YOUR_SENDER_ID",
-  appId:             "YOUR_APP_ID"
+   apiKey: "AIzaSyAMUSqEnyuljpIIlmMBPaxn4zoO9Ka88js",
+  authDomain: "family-finance-pwa-39c21.firebaseapp.com",
+  projectId: "family-finance-pwa-39c21",
+  storageBucket: "family-finance-pwa-39c21.firebasestorage.app",
+  messagingSenderId: "85276467054",
+  appId: "1:85276467054:web:485affb7691236ef41eb7f",
+  measurementId: "G-KTF4YPGN4J"
 };
 
 // ═══════════════════════════════════════════════
@@ -846,10 +980,10 @@ function renderHome(){
   renderHomeChart();
 }
 
-function txHTML(t,showDel=false){
+function txHTML(t,showActions=false){
   const m=getM(t.memberId);
   const dep=t.type==='deposit';
-  return`<div class="tx-row" onclick="if(event.target.closest('.tx-del'))return;void(0)">
+  return`<div class="tx-row">
     <div class="tx-ico ${dep?'dep':'wd'}"><i class="fas fa-${dep?'arrow-down':'arrow-up'}"></i></div>
     <div class="tx-info">
       <div class="tx-nm">${m?m.name.split(' ').slice(0,2).join(' '):'محذوف'}</div>
@@ -859,7 +993,10 @@ function txHTML(t,showDel=false){
       <div class="tx-val ${dep?'dv':'wv'}">${dep?'+':'-'}${fmt(t.amount)}</div>
       <div class="tx-dt">${t.date}</div>
     </div>
-    ${showDel?`<button class="tx-del" onclick="reqDelTx(${t.id})" style="background:var(--red-bg);color:var(--red);border:none;border-radius:8px;padding:6px 9px;font-size:11px;cursor:pointer;margin-right:4px;flex-shrink:0"><i class="fas fa-trash"></i></button>`:''}
+    ${showActions?`
+      <button onclick="openEditTx(${t.id})" style="background:var(--primary-l);color:var(--primary);border:none;border-radius:8px;padding:6px 8px;font-size:11px;cursor:pointer;flex-shrink:0;margin-right:3px"><i class="fas fa-edit"></i></button>
+      <button onclick="reqDelTx(${t.id})" style="background:var(--red-bg);color:var(--red);border:none;border-radius:8px;padding:6px 8px;font-size:11px;cursor:pointer;flex-shrink:0"><i class="fas fa-trash"></i></button>
+    `:''}
   </div>`;
 }
 
@@ -1532,6 +1669,332 @@ async function doReset(){
   setTimeout(()=>location.reload(),1400);
 }
 
+
+// ═══════════════════════════════════════════════
+//  LOGIN
+// ═══════════════════════════════════════════════
+const DEFAULT_PWD = '1234';
+function getStoredPwd(){ return localStorage.getItem('fam_pwd') || DEFAULT_PWD; }
+
+function doLogin(){
+  const pwd = document.getElementById('login-pwd').value;
+  const err = document.getElementById('login-err');
+  if(!pwd){ err.textContent='⚠️ يرجى إدخال كلمة المرور'; return; }
+  if(pwd === getStoredPwd()){
+    document.getElementById('login-screen').style.display='none';
+    localStorage.setItem('fam_sess', Date.now());
+    err.textContent='';
+    document.getElementById('login-pwd').value='';
+  } else {
+    err.textContent='❌ كلمة المرور غير صحيحة';
+    document.getElementById('login-pwd').value='';
+    document.getElementById('login-pwd').focus();
+  }
+}
+
+function togglePwd(){
+  const inp = document.getElementById('login-pwd');
+  const eye = document.getElementById('pwd-eye');
+  if(inp.type==='password'){
+    inp.type='text';
+    eye.className='fas fa-eye-slash';
+  } else {
+    inp.type='password';
+    eye.className='fas fa-eye';
+  }
+}
+
+function doLogout(){
+  localStorage.removeItem('fam_sess');
+  document.getElementById('login-screen').style.display='flex';
+  document.getElementById('login-pwd').value='';
+}
+
+function checkSession(){
+  const sess = localStorage.getItem('fam_sess');
+  if(sess){
+    // Session expires after 8 hours
+    const age = Date.now() - parseInt(sess);
+    if(age < 8 * 60 * 60 * 1000){
+      document.getElementById('login-screen').style.display='none';
+      return;
+    }
+  }
+  document.getElementById('login-screen').style.display='flex';
+}
+
+function changePassword(){
+  const old = document.getElementById('cp-old').value;
+  const nw  = document.getElementById('cp-new').value;
+  const con = document.getElementById('cp-con').value;
+  const err = document.getElementById('cp-err');
+  if(old !== getStoredPwd()){ err.textContent='❌ كلمة المرور الحالية غير صحيحة'; return; }
+  if(nw.length < 4){ err.textContent='⚠️ كلمة المرور يجب أن تكون 4 أحرف على الأقل'; return; }
+  if(nw !== con){ err.textContent='⚠️ كلمتا المرور غير متطابقتين'; return; }
+  localStorage.setItem('fam_pwd', nw);
+  ['cp-old','cp-new','cp-con'].forEach(id=>document.getElementById(id).value='');
+  err.textContent='';
+  closeSheet('ov-chpwd');
+  toast('✅ تم تغيير كلمة المرور بنجاح');
+}
+
+// ═══════════════════════════════════════════════
+//  EDIT TRANSACTION
+// ═══════════════════════════════════════════════
+let editingTxId = null;
+let editTxType = 'deposit';
+
+function openEditTx(tid){
+  const t = T.find(x=>x.id===tid);
+  if(!t) return;
+  editingTxId = tid;
+  editTxType = t.type;
+  // Fill member select
+  const sel = document.getElementById('et-member');
+  sel.innerHTML = M.map(m=>`<option value="${m.id}">${m.name}</option>`).join('');
+  sel.value = t.memberId;
+  // Fill fields
+  document.getElementById('et-amt').value  = t.amount;
+  document.getElementById('et-date').value = t.date;
+  document.getElementById('et-note').value = t.note||'';
+  document.getElementById('et-id').value   = tid;
+  selETT(t.type);
+  openSheet('ov-edittx');
+}
+
+function selETT(type){
+  editTxType = type;
+  document.getElementById('et-dep').className='tb'+(type==='deposit'?' sd':'');
+  document.getElementById('et-wd' ).className='tb'+(type==='withdraw'?' sw2':'');
+}
+
+async function saveEditTx(){
+  const tid    = +document.getElementById('et-id').value;
+  const mid    = +document.getElementById('et-member').value;
+  const amount = +document.getElementById('et-amt').value;
+  const date   = document.getElementById('et-date').value;
+  const note   = document.getElementById('et-note').value.trim();
+  const type   = editTxType;
+  if(!mid||!amount||!date){ toast('⚠️ يرجى ملء الحقول المطلوبة'); return; }
+  if(amount<=0){ toast('⚠️ المبلغ يجب أن يكون أكبر من صفر'); return; }
+  const idx = T.findIndex(t=>t.id===tid);
+  if(idx===-1){ toast('⚠️ لم يتم العثور على المعاملة'); return; }
+  T[idx] = {...T[idx], memberId:mid, type, amount, date, note};
+  await save();
+  closeSheet('ov-edittx');
+  renderTx(); renderHome();
+  toast('✅ تم تعديل المعاملة بنجاح');
+}
+
+// ═══════════════════════════════════════════════
+//  PDF REPORTS
+// ═══════════════════════════════════════════════
+let pdfMemberSel = null;
+
+function openPDF(type){
+  let content = '';
+  const dep = T.filter(t=>t.type==='deposit' ).reduce((s,t)=>s+t.amount,0);
+  const wd  = T.filter(t=>t.type==='withdraw').reduce((s,t)=>s+t.amount,0);
+  const dt  = new Date().toLocaleDateString('ar-OM',{year:'numeric',month:'long',day:'numeric'});
+
+  if(type==='full'){
+    // Full report: summary + all members + all transactions
+    const memberRows = M.map(m=>{
+      const s=stats(m.id);
+      return `<tr>
+        <td>${m.name}</td>
+        <td>${m.phone}</td>
+        <td style="color:#52B788;font-weight:700">${fmt(s.dep)}</td>
+        <td style="color:#E07A5F">${fmt(s.wd)}</td>
+        <td style="font-weight:800;color:${s.bal<0?'#E07A5F':'#4F7CAC'}">${fmt(s.bal)}</td>
+        <td>${s.count}</td>
+      </tr>`;
+    }).join('');
+
+    const txRows = [...T].sort((a,b)=>new Date(b.date)-new Date(a.date)).map((t,i)=>{
+      const m=getM(t.memberId);
+      const dep=t.type==='deposit';
+      return `<tr>
+        <td>${i+1}</td>
+        <td>${m?m.name:'-'}</td>
+        <td style="color:${dep?'#52B788':'#E07A5F'};font-weight:700">${dep?'إيداع':'سحب'}</td>
+        <td style="color:${dep?'#52B788':'#E07A5F'};font-weight:700">${dep?'+':'-'}${fmt(t.amount)}</td>
+        <td>${t.date}</td>
+        <td style="color:#9AAABB">${t.note||'-'}</td>
+      </tr>`;
+    }).join('');
+
+    content = `
+      <div class="pdf-header">
+        <h1>الجمعية المالية الأسرية</h1>
+        <p>التقرير المالي الشامل • تاريخ الإصدار: ${dt}</p>
+      </div>
+      <div class="pdf-section-title">ملخص عام</div>
+      <div class="pdf-stat-grid">
+        <div class="pdf-stat"><div class="pdf-stat-val" style="color:#52B788">${fmt(dep)}</div><div class="pdf-stat-lbl">إجمالي الإيداعات (ر.ع)</div></div>
+        <div class="pdf-stat"><div class="pdf-stat-val" style="color:#E07A5F">${fmt(wd)}</div><div class="pdf-stat-lbl">إجمالي السحوبات (ر.ع)</div></div>
+        <div class="pdf-stat"><div class="pdf-stat-val">${fmt(dep-wd)}</div><div class="pdf-stat-lbl">صافي الرصيد (ر.ع)</div></div>
+        <div class="pdf-stat"><div class="pdf-stat-val" style="color:#4F7CAC">${M.length}</div><div class="pdf-stat-lbl">عدد المساهمين</div></div>
+        <div class="pdf-stat"><div class="pdf-stat-val" style="color:#D4A843">${T.length}</div><div class="pdf-stat-lbl">إجمالي المعاملات</div></div>
+        <div class="pdf-stat"><div class="pdf-stat-val" style="color:#E07A5F">${M.filter(m=>stats(m.id).bal<0).length}</div><div class="pdf-stat-lbl">مساهمون بدين</div></div>
+      </div>
+      <div class="pdf-section-title">كشف أرصدة المساهمين</div>
+      <table class="pdf-table">
+        <thead><tr><th>الاسم</th><th>الهاتف</th><th>الإيداعات</th><th>السحوبات</th><th>الرصيد</th><th>المعاملات</th></tr></thead>
+        <tbody>${memberRows||'<tr><td colspan="6" style="text-align:center">لا يوجد مساهمون</td></tr>'}</tbody>
+      </table>
+      <div class="pdf-section-title">سجل المعاملات الكاملة</div>
+      <table class="pdf-table">
+        <thead><tr><th>#</th><th>المساهم</th><th>النوع</th><th>المبلغ (ر.ع)</th><th>التاريخ</th><th>ملاحظة</th></tr></thead>
+        <tbody>${txRows||'<tr><td colspan="6" style="text-align:center">لا توجد معاملات</td></tr>'}</tbody>
+      </table>
+      <div class="pdf-footer">الجمعية المالية الأسرية • سلطنة عُمان • صدر بتاريخ ${dt}</div>
+    `;
+  }
+
+  else if(type==='member'){
+    // Member statement — pick member with a selector
+    const memberOptions = M.map(m=>`<option value="${m.id}">${m.name}</option>`).join('');
+    content = `
+      <div class="pdf-header">
+        <h1>الجمعية المالية الأسرية</h1>
+        <p>كشف حساب مساهم • تاريخ الإصدار: ${dt}</p>
+      </div>
+      <div style="margin-bottom:16px">
+        <label style="font-size:12px;font-weight:700;color:#5A6A7E;display:block;margin-bottom:6px">اختر المساهم:</label>
+        <select id="pdf-member-sel" onchange="renderMemberPDF()" style="width:100%;border:1.5px solid #E4EAF2;border-radius:10px;padding:10px;font-size:14px;font-family:'Cairo',sans-serif">
+          ${memberOptions}
+        </select>
+      </div>
+      <div id="pdf-member-content"></div>
+    `;
+    document.getElementById('pdf-page').innerHTML = content;
+    document.getElementById('pdf-preview').style.display='block';
+    renderMemberPDF();
+    return;
+  }
+
+  else if(type==='monthly'){
+    // Monthly report
+    const yrs = allYrs();
+    const yrOpts = yrs.map(y=>`<option value="${y}">${y}</option>`).join('');
+    const moOpts = `<option value="">كل الأشهر</option>
+      <option value="01">يناير</option><option value="02">فبراير</option><option value="03">مارس</option>
+      <option value="04">أبريل</option><option value="05">مايو</option><option value="06">يونيو</option>
+      <option value="07">يوليو</option><option value="08">أغسطس</option><option value="09">سبتمبر</option>
+      <option value="10">أكتوبر</option><option value="11">نوفمبر</option><option value="12">ديسمبر</option>`;
+    content = `
+      <div class="pdf-header">
+        <h1>الجمعية المالية الأسرية</h1>
+        <p>التقرير الشهري • تاريخ الإصدار: ${dt}</p>
+      </div>
+      <div style="display:flex;gap:10px;margin-bottom:16px">
+        <select id="pdf-yr-sel" onchange="renderMonthlyPDF()" style="flex:1;border:1.5px solid #E4EAF2;border-radius:10px;padding:10px;font-size:13px;font-family:'Cairo',sans-serif">${yrOpts}</select>
+        <select id="pdf-mo-sel" onchange="renderMonthlyPDF()" style="flex:1;border:1.5px solid #E4EAF2;border-radius:10px;padding:10px;font-size:13px;font-family:'Cairo',sans-serif">${moOpts}</select>
+      </div>
+      <div id="pdf-monthly-content"></div>
+    `;
+    document.getElementById('pdf-page').innerHTML = content;
+    document.getElementById('pdf-preview').style.display='block';
+    renderMonthlyPDF();
+    return;
+  }
+
+  document.getElementById('pdf-page').innerHTML = content;
+  document.getElementById('pdf-preview').style.display='block';
+}
+
+function renderMemberPDF(){
+  const sel = document.getElementById('pdf-member-sel');
+  if(!sel) return;
+  const mid = +sel.value;
+  const m = getM(mid);
+  if(!m){ document.getElementById('pdf-member-content').innerHTML=''; return; }
+  const s = stats(mid);
+  const txs = [...T.filter(t=>t.memberId===mid)].sort((a,b)=>new Date(a.date)-new Date(b.date));
+  let runBal=0;
+  const rows = txs.map((t,i)=>{
+    runBal += t.type==='deposit'?t.amount:-t.amount;
+    const dep=t.type==='deposit';
+    return`<tr>
+      <td>${i+1}</td>
+      <td>${t.date}</td>
+      <td style="color:${dep?'#52B788':'#E07A5F'};font-weight:700">${dep?'إيداع':'سحب'}</td>
+      <td style="color:${dep?'#52B788':'#E07A5F'};font-weight:700">${dep?'+':'-'}${fmt(t.amount)}</td>
+      <td style="font-weight:800;color:${runBal<0?'#E07A5F':'#4F7CAC'}">${fmt(runBal)}</td>
+      <td style="color:#9AAABB">${t.note||'-'}</td>
+    </tr>`;
+  }).join('');
+  const dt = new Date().toLocaleDateString('ar-OM',{year:'numeric',month:'long',day:'numeric'});
+  document.getElementById('pdf-member-content').innerHTML=`
+    <div style="background:#EEF2F7;border-radius:10px;padding:16px;margin-bottom:16px;display:flex;align-items:center;gap:14px">
+      <div style="width:52px;height:52px;border-radius:50%;background:${m.color||'#4F7CAC'};display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:800;color:#fff;flex-shrink:0">${ini(m.name)}</div>
+      <div>
+        <div style="font-size:16px;font-weight:800;color:#1A2235">${m.name}</div>
+        <div style="font-size:12px;color:#5A6A7E">${m.phone} • عضو منذ: ${m.date}</div>
+      </div>
+    </div>
+    <div class="pdf-stat-grid">
+      <div class="pdf-stat"><div class="pdf-stat-val" style="color:#52B788">${fmt(s.dep)}</div><div class="pdf-stat-lbl">إجمالي الإيداعات (ر.ع)</div></div>
+      <div class="pdf-stat"><div class="pdf-stat-val" style="color:#E07A5F">${fmt(s.wd)}</div><div class="pdf-stat-lbl">إجمالي السحوبات (ر.ع)</div></div>
+      <div class="pdf-stat"><div class="pdf-stat-val" style="color:${s.bal<0?'#E07A5F':'#4F7CAC'}">${fmt(s.bal)}</div><div class="pdf-stat-lbl">${s.bal<0?'الدين (ر.ع)':'الرصيد (ر.ع)'}</div></div>
+    </div>
+    <div class="pdf-section-title">سجل المعاملات</div>
+    <table class="pdf-table">
+      <thead><tr><th>#</th><th>التاريخ</th><th>النوع</th><th>المبلغ (ر.ع)</th><th>الرصيد (ر.ع)</th><th>ملاحظة</th></tr></thead>
+      <tbody>${rows||'<tr><td colspan="6" style="text-align:center">لا توجد معاملات</td></tr>'}</tbody>
+    </table>
+    <div class="pdf-footer">الجمعية المالية الأسرية • سلطنة عُمان • صدر بتاريخ ${dt}</div>
+  `;
+}
+
+function renderMonthlyPDF(){
+  const yrSel = document.getElementById('pdf-yr-sel');
+  const moSel = document.getElementById('pdf-mo-sel');
+  if(!yrSel||!moSel) return;
+  const yr = yrSel.value;
+  const mo = moSel.value;
+  if(!yr){ document.getElementById('pdf-monthly-content').innerHTML=''; return; }
+  let txs = T.filter(t=>t.date.startsWith(yr));
+  if(mo) txs = txs.filter(t=>t.date.slice(5,7)===mo);
+  const dep = txs.filter(t=>t.type==='deposit' ).reduce((s,t)=>s+t.amount,0);
+  const wd  = txs.filter(t=>t.type==='withdraw').reduce((s,t)=>s+t.amount,0);
+  const label = mo ? `${moN(mo)} ${yr}` : `سنة ${yr}`;
+  const rows = [...txs].sort((a,b)=>new Date(a.date)-new Date(b.date)).map((t,i)=>{
+    const m=getM(t.memberId);const dep=t.type==='deposit';
+    return`<tr>
+      <td>${i+1}</td>
+      <td>${m?m.name:'-'}</td>
+      <td style="color:${dep?'#52B788':'#E07A5F'};font-weight:700">${dep?'إيداع':'سحب'}</td>
+      <td style="color:${dep?'#52B788':'#E07A5F'};font-weight:700">${dep?'+':'-'}${fmt(t.amount)}</td>
+      <td>${t.date}</td>
+      <td style="color:#9AAABB">${t.note||'-'}</td>
+    </tr>`;
+  }).join('');
+  const dt = new Date().toLocaleDateString('ar-OM',{year:'numeric',month:'long',day:'numeric'});
+  document.getElementById('pdf-monthly-content').innerHTML=`
+    <div class="pdf-stat-grid">
+      <div class="pdf-stat"><div class="pdf-stat-val" style="color:#52B788">${fmt(dep)}</div><div class="pdf-stat-lbl">إيداعات ${label} (ر.ع)</div></div>
+      <div class="pdf-stat"><div class="pdf-stat-val" style="color:#E07A5F">${fmt(wd)}</div><div class="pdf-stat-lbl">سحوبات ${label} (ر.ع)</div></div>
+      <div class="pdf-stat"><div class="pdf-stat-val">${fmt(dep-wd)}</div><div class="pdf-stat-lbl">الصافي (ر.ع)</div></div>
+    </div>
+    <div class="pdf-section-title">معاملات ${label} (${txs.length} معاملة)</div>
+    <table class="pdf-table">
+      <thead><tr><th>#</th><th>المساهم</th><th>النوع</th><th>المبلغ (ر.ع)</th><th>التاريخ</th><th>ملاحظة</th></tr></thead>
+      <tbody>${rows||'<tr><td colspan="6" style="text-align:center">لا توجد معاملات</td></tr>'}</tbody>
+    </table>
+    <div class="pdf-footer">الجمعية المالية الأسرية • سلطنة عُمان • صدر بتاريخ ${dt}</div>
+  `;
+}
+
+function closePDF(){
+  document.getElementById('pdf-preview').style.display='none';
+}
+
+function downloadPDF(){
+  window.print();
+}
+
 // ═══════════════════════════════════════════════
 //  INIT
 // ═══════════════════════════════════════════════
@@ -1543,6 +2006,8 @@ fillTxMembers();
 buildYrBar();
 renderHome();
 if(!isOnline)document.getElementById('offline-bar').style.display='flex';
+// Check login session
+checkSession();
 
 // Register Service Worker
 if('serviceWorker' in navigator){
