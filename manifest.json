@@ -2,7 +2,8 @@
   "name": "الجمعية المالية الأسرية",
   "short_name": "جمعيتي",
   "description": "تطبيق إدارة الجمعية المالية الأسرية - سلطنة عُمان",
-  "start_url": "/index.html",
+  "start_url": "./index.html",
+  "scope": "./",
   "display": "standalone",
   "background_color": "#2C4A6E",
   "theme_color": "#4F7CAC",
@@ -20,13 +21,12 @@
     { "src": "icons/icon-384x384.png", "sizes": "384x384", "type": "image/png", "purpose": "maskable any" },
     { "src": "icons/icon-512x512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable any" }
   ],
-  "screenshots": [],
   "shortcuts": [
     {
       "name": "إضافة معاملة",
       "short_name": "معاملة",
       "description": "تسجيل إيداع أو سحب جديد",
-      "url": "/index.html#tx",
+      "url": "./index.html",
       "icons": [{ "src": "icons/icon-96x96.png", "sizes": "96x96" }]
     }
   ]
