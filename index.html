@@ -1,0 +1,1559 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#4F7CAC">
+<title>الجمعية المالية الأسرية</title>
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icons/icon-192x192.png">
+<link rel="icon" type="image/png" sizes="32x32" href="icons/icon-96x96.png">
+<meta name="apple-mobile-web-app-title" content="جمعيتي">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+/* ══════════════════ VARIABLES ══════════════════ */
+:root{
+  --bg:#EEF2F7;--surface:#FFF;--surface2:#F7F9FC;
+  --primary:#4F7CAC;--primary-d:#3A5F8A;--primary-l:#D6E4F0;
+  --green:#52B788;--green-bg:#EDFAF3;
+  --red:#E07A5F;--red-bg:#FDF1EE;
+  --amber:#D4A843;--amber-bg:#FDF6E3;
+  --purple:#8B6FCE;--purple-bg:#F0EDFB;
+  --text:#1A2235;--text2:#5A6A7E;--text3:#9AAABB;--border:#E4EAF2;
+  --sh:0 2px 16px rgba(79,124,172,.10);--sh-sm:0 1px 6px rgba(79,124,172,.08);
+  --r:16px;--r-sm:10px;--nav:72px;
+}
+/* ══════════════════ RESET ══════════════════ */
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;overflow:hidden;background:var(--bg)}
+body{font-family:'Cairo',sans-serif;color:var(--text);font-size:14px}
+button,input,select,textarea{font-family:'Cairo',sans-serif}
+
+/* ══════════════════ SHELL ══════════════════ */
+#app{display:flex;flex-direction:column;height:100dvh;height:100vh;overflow:hidden}
+#mc{flex:1;overflow-y:auto;overflow-x:hidden;scroll-behavior:smooth;padding-bottom:calc(var(--nav)+8px)}
+#mc::-webkit-scrollbar{display:none}
+
+/* ══════════════════ BOTTOM NAV ══════════════════ */
+#bnav{
+  position:fixed;bottom:0;left:0;right:0;height:var(--nav);
+  background:rgba(255,255,255,.94);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+  border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-around;
+  padding:0 4px 8px;z-index:100;box-shadow:0 -4px 24px rgba(79,124,172,.09)
+}
+.ni{display:flex;flex-direction:column;align-items:center;gap:3px;padding:8px 10px;border-radius:12px;cursor:pointer;transition:all .2s;min-width:48px}
+.ni i{font-size:18px;color:var(--text3);transition:all .22s}
+.ni span{font-size:10px;color:var(--text3);font-weight:500;transition:all .22s}
+.ni.active i{color:var(--primary)}
+.ni.active span{color:var(--primary);font-weight:700}
+.ni.active{background:var(--primary-l)}
+
+/* ══════════════════ SCREENS ══════════════════ */
+.screen{display:none;min-height:100%}
+.screen.active{display:block}
+
+/* ══════════════════ OFFLINE BANNER ══════════════════ */
+#offline-bar{display:none;position:fixed;top:0;left:0;right:0;z-index:300;background:var(--amber);color:#fff;padding:7px 16px;font-size:12px;font-weight:700;align-items:center;justify-content:center;gap:6px}
+
+/* ══════════════════ HEADERS ══════════════════ */
+.ph{background:linear-gradient(145deg,#4F7CAC,#2C4A6E);padding:52px 20px 28px;position:relative;overflow:hidden}
+.ph::before{content:'';position:absolute;top:-50px;left:-50px;width:220px;height:220px;border-radius:50%;background:rgba(255,255,255,.06)}
+.ph::after{content:'';position:absolute;bottom:-70px;right:-40px;width:180px;height:180px;border-radius:50%;background:rgba(255,255,255,.04)}
+.ph h2{color:rgba(255,255,255,.75);font-size:12px;font-weight:500;margin-bottom:3px;position:relative;z-index:1}
+.ph h1{color:#fff;font-size:22px;font-weight:800;position:relative;z-index:1}
+.sub-ph{background:var(--primary);padding:48px 20px 18px;color:#fff}
+.sub-ph h1{font-size:19px;font-weight:800}
+.sub-ph p{font-size:12px;opacity:.7;margin-top:3px}
+
+/* ══════════════════ HERO BALANCE ══════════════════ */
+.hero-wrap{padding:0 16px;margin-top:-26px;position:relative;z-index:10}
+.bal-card{background:var(--surface);border-radius:var(--r);padding:18px 20px;box-shadow:var(--sh)}
+.bal-label{font-size:11px;color:var(--text3);font-weight:500;margin-bottom:2px}
+.bal-amount{font-size:30px;font-weight:900;color:var(--primary);line-height:1.1;letter-spacing:-.5px}
+.bal-amount span{font-size:15px;font-weight:600;opacity:.7}
+.bal-row{display:flex;gap:10px;margin-top:14px}
+.bal-chip{flex:1;background:var(--surface2);border-radius:10px;padding:10px 12px}
+.bal-chip .cl{font-size:10px;color:var(--text3);margin-bottom:2px}
+.bal-chip .cv{font-size:14px;font-weight:700}
+.cv-g{color:var(--green)}.cv-r{color:var(--red)}
+
+/* ══════════════════ CARDS / SECTIONS ══════════════════ */
+.sw{padding:12px 16px 4px}
+.stitle{font-size:12px;font-weight:700;color:var(--text2);margin-bottom:8px;display:flex;align-items:center;justify-content:space-between}
+.see-all{font-size:11px;color:var(--primary);font-weight:700;cursor:pointer;padding:2px 8px}
+.card{background:var(--surface);border-radius:var(--r);box-shadow:var(--sh-sm);overflow:hidden}
+
+/* ══════════════════ MINI STATS ══════════════════ */
+.ms-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:12px 16px 4px}
+.ms{background:var(--surface);border-radius:var(--r-sm);padding:13px;box-shadow:var(--sh-sm)}
+.ms-lbl{font-size:10px;color:var(--text3);margin-bottom:5px;font-weight:500}
+.ms-val{font-size:17px;font-weight:800}
+.mv-b{color:var(--primary)}.mv-g{color:var(--green)}.mv-r{color:var(--red)}.mv-a{color:var(--amber)}
+
+/* ══════════════════ TX ROW ══════════════════ */
+.tx-row{display:flex;align-items:center;gap:11px;padding:11px 16px;border-bottom:1px solid var(--border);cursor:pointer;transition:background .15s}
+.tx-row:last-child{border-bottom:none}
+.tx-row:active{background:var(--surface2)}
+.tx-ico{width:38px;height:38px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0}
+.tx-ico.dep{background:var(--green-bg);color:var(--green)}
+.tx-ico.wd{background:var(--red-bg);color:var(--red)}
+.tx-info{flex:1;min-width:0}
+.tx-nm{font-size:13px;font-weight:600;color:var(--text)}
+.tx-nt{font-size:11px;color:var(--text3);margin-top:1px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tx-right{text-align:left;flex-shrink:0}
+.tx-val{font-size:13px;font-weight:700}
+.tx-dt{font-size:10px;color:var(--text3);text-align:left;margin-top:2px}
+.dv{color:var(--green)}.wv{color:var(--red)}
+
+/* ══════════════════ MEMBER ROW ══════════════════ */
+.mr{display:flex;align-items:center;gap:11px;padding:12px 16px;border-bottom:1px solid var(--border);cursor:pointer;transition:background .15s}
+.mr:last-child{border-bottom:none}
+.mr:active{background:var(--surface2)}
+.av{width:40px;height:40px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:800;color:#fff}
+.mi{flex:1;min-width:0}
+.mn{font-size:13px;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ms2{font-size:11px;color:var(--text3);margin-top:1px}
+.mb{text-align:left;flex-shrink:0}
+.mb-n{font-size:13px;font-weight:700}
+.mb-l{font-size:10px;color:var(--text3);text-align:left;margin-top:1px}
+
+/* ══════════════════ SEARCH / FILTER ══════════════════ */
+.search-wrap{padding:10px 16px 0}
+.si-wrap{position:relative}
+.si-wrap i{position:absolute;right:13px;top:50%;transform:translateY(-50%);color:var(--text3);font-size:14px}
+.si{width:100%;background:var(--surface);border:1.5px solid var(--border);border-radius:12px;padding:10px 38px 10px 13px;font-size:13px;color:var(--text);outline:none;transition:border-color .2s}
+.si:focus{border-color:var(--primary)}
+.fp{display:flex;gap:6px;margin-top:8px;overflow-x:auto;padding-bottom:3px}
+.fp::-webkit-scrollbar{display:none}
+.pill{flex-shrink:0;border:1.5px solid var(--border);background:var(--surface);border-radius:20px;padding:5px 13px;font-size:11px;font-weight:700;color:var(--text2);cursor:pointer;transition:all .18s;white-space:nowrap}
+.pill.act{background:var(--primary);border-color:var(--primary);color:#fff}
+.pill.act-g{background:var(--green);border-color:var(--green);color:#fff}
+.pill.act-r{background:var(--red);border-color:var(--red);color:#fff}
+.pill.act-a{background:var(--amber);border-color:var(--amber);color:#fff}
+
+/* ══════════════════ PERIOD BAR ══════════════════ */
+.pbar{display:flex;gap:6px;padding:8px 16px 0;overflow-x:auto}
+.pbar::-webkit-scrollbar{display:none}
+.pc{flex-shrink:0;border:1.5px solid var(--border);background:var(--surface);border-radius:20px;padding:4px 11px;font-size:11px;font-weight:700;color:var(--text2);cursor:pointer;transition:all .18s}
+.pc.act{background:var(--amber);border-color:var(--amber);color:#fff}
+.plbl{font-size:10px;font-weight:700;color:var(--text3);padding:8px 16px 3px;display:flex;align-items:center;gap:5px}
+.plbl::after{content:'';flex:1;height:1px;background:var(--border)}
+
+/* ══════════════════ SORT BAR ══════════════════ */
+.sort-bar{display:flex;align-items:center;justify-content:space-between;padding:6px 16px 2px}
+.sort-bar select{background:var(--surface2);border:1.5px solid var(--border);border-radius:8px;padding:5px 10px;font-size:11px;color:var(--text2);font-weight:600;outline:none}
+
+/* ══════════════════ FAB ══════════════════ */
+/* FAB handled inline */
+
+/* ══════════════════ OVERLAY / SHEET ══════════════════ */
+.ov{display:none;position:fixed;inset:0;background:rgba(15,25,40,.5);z-index:200;backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);align-items:flex-end}
+.ov.show{display:flex}
+.sheet{width:100%;max-height:94dvh;max-height:94vh;background:var(--surface);border-radius:22px 22px 0 0;overflow-y:auto;padding:0 0 36px;animation:su .28s cubic-bezier(.34,1.1,.64,1)}
+.sheet::-webkit-scrollbar{display:none}
+@keyframes su{from{transform:translateY(100%)}to{transform:translateY(0)}}
+.sh{width:36px;height:4px;background:var(--border);border-radius:2px;margin:12px auto 0}
+.shdr{padding:14px 20px 11px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.shtitle{font-size:15px;font-weight:800;color:var(--text)}
+.shclose{width:30px;height:30px;background:var(--surface2);border-radius:50%;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--text2);font-size:14px}
+.sbody{padding:14px 20px}
+
+/* ══════════════════ FORMS ══════════════════ */
+.fg{margin-bottom:13px}
+.fl{font-size:11px;font-weight:700;color:var(--text2);margin-bottom:5px;display:block}
+.fi,.fs{width:100%;background:var(--surface2);border:1.5px solid var(--border);border-radius:11px;padding:11px 13px;font-size:13px;color:var(--text);outline:none;transition:border-color .2s;appearance:none}
+.fi:focus,.fs:focus{border-color:var(--primary);background:#fff}
+.frow{display:grid;grid-template-columns:1fr 1fr;gap:11px}
+.btn-p{width:100%;background:var(--primary);color:#fff;border:none;border-radius:13px;padding:14px;font-size:14px;font-weight:700;cursor:pointer;box-shadow:0 4px 16px rgba(79,124,172,.30);transition:all .2s}
+.btn-p:active{transform:scale(.98)}
+.btn-p.g{background:var(--green);box-shadow:0 4px 16px rgba(82,183,136,.30)}
+.btn-p.r{background:var(--red);box-shadow:0 4px 16px rgba(224,122,95,.30)}
+.btn-p.a{background:var(--amber);box-shadow:0 4px 16px rgba(212,168,67,.30)}
+.brow{display:flex;gap:9px;margin-top:4px}
+.btn-o{flex:1;background:transparent;border:1.5px solid var(--border);border-radius:13px;padding:12px;font-size:13px;font-weight:700;color:var(--text2);cursor:pointer}
+.type-sel{display:flex;gap:7px;margin-bottom:13px}
+.tb{flex:1;padding:11px;border-radius:11px;border:1.5px solid var(--border);background:var(--surface2);font-size:13px;font-weight:700;color:var(--text2);cursor:pointer;transition:all .2s}
+.tb.sd{background:var(--green-bg);border-color:var(--green);color:var(--green)}
+.tb.sw2{background:var(--red-bg);border-color:var(--red);color:var(--red)}
+
+/* ══════════════════ DETAIL SHEET ══════════════════ */
+.dh{padding:18px 20px 12px;text-align:center}
+.dav{width:62px;height:62px;border-radius:50%;margin:0 auto 10px;display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:800;color:#fff}
+.dn{font-size:17px;font-weight:800;color:var(--text)}
+.dp{font-size:12px;color:var(--text3);margin-top:3px}
+.dst{display:grid;grid-template-columns:1fr 1fr 1fr;gap:7px;padding:0 16px 10px}
+.dsc{background:var(--surface2);border-radius:11px;padding:11px;text-align:center}
+.dsv{font-size:14px;font-weight:800}
+.dsl{font-size:10px;color:var(--text3);margin-top:2px;font-weight:500}
+.dtabs{display:flex;border-bottom:2px solid var(--border);padding:0 16px;margin-bottom:0}
+.dtab{flex:1;text-align:center;padding:9px 4px;border:none;background:none;font-size:12px;font-weight:700;color:var(--text3);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;transition:all .2s}
+.dtab.act{color:var(--primary);border-bottom-color:var(--primary)}
+.dtc{display:none;padding:10px 16px}
+.dtc.act{display:block}
+.debt-warn{background:var(--red-bg);border:1px solid var(--red);border-radius:10px;padding:8px 13px;margin:0 16px 10px;font-size:11px;color:var(--red);font-weight:700;display:flex;align-items:center;gap:6px}
+
+/* ══════════════════ MEMBER ACTION BUTTONS ══════════════════ */
+.m-actions{display:flex;gap:8px;padding:10px 16px 0}
+.act-btn{flex:1;border:none;border-radius:11px;padding:10px;font-size:12px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:5px}
+.act-edit{background:var(--primary-l);color:var(--primary)}
+.act-del{background:var(--red-bg);color:var(--red)}
+.act-wa{background:#dcf8e8;color:#128C7E}
+.act-tx{background:var(--green-bg);color:var(--green)}
+
+/* ══════════════════ LEDGER TABLE ══════════════════ */
+.tbl-wrap{overflow-x:auto}
+.tbl{width:100%;border-collapse:collapse;font-size:11px}
+.tbl th{background:var(--surface2);padding:8px 9px;text-align:right;color:var(--text2);font-weight:700;font-size:10px;border-bottom:1px solid var(--border)}
+.tbl td{padding:8px 9px;text-align:right;border-bottom:1px solid var(--border);color:var(--text)}
+.tbl tr:last-child td{border-bottom:none}
+
+/* ══════════════════ REPORT TABS ══════════════════ */
+.tab-row{display:flex;gap:0;background:var(--surface2);border-radius:11px;padding:3px;margin-bottom:12px}
+.tab-b{flex:1;padding:8px 4px;border-radius:9px;border:none;background:transparent;font-size:11px;font-weight:700;color:var(--text2);cursor:pointer;transition:all .2s}
+.tab-b.act{background:var(--surface);color:var(--primary);box-shadow:var(--sh-sm)}
+
+/* ══════════════════ WHATSAPP ══════════════════ */
+.wa-btn{display:flex;align-items:center;justify-content:center;gap:7px;width:100%;background:#25D366;color:#fff;border:none;border-radius:13px;padding:13px;font-size:14px;font-weight:700;cursor:pointer;margin-top:9px}
+.wa-box{background:var(--surface2);border-radius:11px;padding:13px;font-size:12px;color:var(--text);direction:ltr;white-space:pre-wrap;line-height:1.7;border:1px solid var(--border);margin-top:9px}
+
+/* ══════════════════ TOAST ══════════════════ */
+#toast{position:fixed;top:22px;left:50%;transform:translateX(-50%) translateY(-90px);background:#1A2235;color:#fff;padding:10px 20px;border-radius:24px;font-size:12px;font-weight:700;z-index:999;transition:transform .3s cubic-bezier(.34,1.1,.64,1);white-space:nowrap;box-shadow:0 4px 20px rgba(0,0,0,.22)}
+#toast.show{transform:translateX(-50%) translateY(0)}
+
+/* ══════════════════ MISC ══════════════════ */
+.empty{text-align:center;padding:34px 16px;color:var(--text3)}
+.empty i{font-size:40px;margin-bottom:12px;display:block}
+.empty p{font-size:13px}
+.badge{display:inline-block;padding:2px 9px;border-radius:20px;font-size:10px;font-weight:700}
+.bg{background:var(--green-bg);color:var(--green)}
+.br{background:var(--red-bg);color:var(--red)}
+.bb{background:var(--primary-l);color:var(--primary)}
+.ba{background:var(--amber-bg);color:var(--amber)}
+.rmc{background:var(--surface);border-radius:13px;padding:13px 15px;box-shadow:var(--sh-sm);display:flex;align-items:center;gap:11px;cursor:pointer;transition:all .2s;margin-bottom:9px}
+.rmc:active{transform:scale(.98)}
+.rm-info{flex:1}.rm-nm{font-size:13px;font-weight:700}.rm-sub{font-size:11px;margin-top:2px}
+.chart-box{background:var(--surface);border-radius:var(--r);padding:14px;box-shadow:var(--sh-sm)}
+.ct{font-size:12px;font-weight:700;color:var(--text2);margin-bottom:12px}
+
+/* ══════════════════ SETTINGS ══════════════════ */
+.cfg-sec{background:var(--surface);border-radius:var(--r);box-shadow:var(--sh-sm);margin-bottom:12px;overflow:hidden}
+.cfg-hdr{padding:10px 15px;background:var(--surface2);font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.5px}
+.cfg-row{padding:13px 15px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--border)}
+.cfg-row:last-child{border-bottom:none}
+.cfg-lbl{font-size:12px;color:var(--text2)}
+.cfg-val{font-size:12px;font-weight:700;color:var(--text)}
+
+/* ══════════════════ CONFIRM DIALOG ══════════════════ */
+.confirm-box{background:var(--surface2);border-radius:14px;padding:20px;margin-bottom:16px;text-align:center}
+.confirm-icon{font-size:40px;margin-bottom:10px}
+.confirm-title{font-size:15px;font-weight:800;margin-bottom:6px}
+.confirm-msg{font-size:12px;color:var(--text2);line-height:1.7}
+</style>
+</head>
+<body>
+
+<div id="offline-bar"><i class="fas fa-wifi-slash"></i> وضع عدم الاتصال — البيانات محفوظة محلياً</div>
+<div id="toast"></div>
+
+<div id="app">
+ <div id="mc">
+
+  <!-- ════════════ HOME ════════════ -->
+  <div class="screen active" id="s-home">
+    <div class="ph">
+      <h2>مرحباً بك</h2>
+      <h1>الجمعية المالية الأسرية</h1>
+    </div>
+    <div class="hero-wrap">
+      <div class="bal-card">
+        <div class="bal-label">إجمالي رصيد الجمعية</div>
+        <div class="bal-amount" id="h-bal">0 <span>ر.ع</span></div>
+        <div style="display:flex;gap:8px;margin-top:14px;margin-bottom:2px">
+          <button onclick="openTxSheet()" style="flex:1;background:var(--green);color:#fff;border:none;border-radius:11px;padding:11px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Cairo',sans-serif">+ إيداع / سحب</button>
+          <button onclick="openMemberSheet()" style="flex:1;background:var(--primary-l);color:var(--primary);border:none;border-radius:11px;padding:11px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Cairo',sans-serif">+ مساهم جديد</button>
+        </div>
+        <div class="bal-row">
+          <div class="bal-chip"><div class="cl">إجمالي الإيداعات</div><div class="cv cv-g" id="h-dep">0</div></div>
+          <div class="bal-chip"><div class="cl">إجمالي السحوبات</div><div class="cv cv-r" id="h-wd">0</div></div>
+        </div>
+      </div>
+    </div>
+    <div class="ms-grid">
+      <div class="ms"><div class="ms-lbl">عدد المساهمين</div><div class="ms-val mv-b" id="h-mc">0</div></div>
+      <div class="ms"><div class="ms-lbl">إجمالي المعاملات</div><div class="ms-val mv-a" id="h-tc">0</div></div>
+      <div class="ms"><div class="ms-lbl">أعلى مساهم</div><div class="ms-val mv-g" style="font-size:12px" id="h-top">-</div></div>
+      <div class="ms"><div class="ms-lbl">إيداعات هذا الشهر</div><div class="ms-val mv-b" id="h-mo">0 ر.ع</div></div>
+    </div>
+    <div style="padding:8px 16px">
+      <div class="chart-box">
+        <div class="ct">الإيداعات والسحوبات حسب المساهم</div>
+        <div style="position:relative;height:170px"><canvas id="homeChart"></canvas></div>
+      </div>
+    </div>
+    <div class="sw">
+      <div class="stitle">أحدث المعاملات <span class="see-all" onclick="goTo('s-tx')">عرض الكل</span></div>
+      <div class="card" id="h-recent"></div>
+    </div>
+    <div class="sw" style="padding-bottom:14px">
+      <div class="stitle">المساهمون <span class="see-all" onclick="goTo('s-members')">عرض الكل</span></div>
+      <div class="card" id="h-mlist"></div>
+    </div>
+  </div>
+
+  <!-- ════════════ MEMBERS ════════════ -->
+  <div class="screen" id="s-members">
+    <div class="sub-ph" style="display:flex;align-items:center;justify-content:space-between;padding-left:16px">
+      <div><h1>المساهمون</h1><p id="m-hdr">0 مساهم</p></div>
+      <button onclick="openMemberSheet()" style="background:rgba(255,255,255,.2);border:1.5px solid rgba(255,255,255,.5);color:#fff;border-radius:12px;padding:8px 14px;font-size:13px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:6px;font-family:'Cairo',sans-serif">
+        <span style="font-size:18px;line-height:1">+</span> إضافة
+      </button>
+    </div>
+    <div class="search-wrap">
+      <div class="si-wrap"><i class="fas fa-search"></i><input class="si" id="m-search" placeholder="بحث بالاسم أو الهاتف..." oninput="renderMembers()"></div>
+      <div class="fp">
+        <div class="pill act" data-ms="name" onclick="setMS(this)">الاسم أ-ي</div>
+        <div class="pill" data-ms="balance-d" onclick="setMS(this)">أعلى رصيد</div>
+        <div class="pill" data-ms="balance-a" onclick="setMS(this)">أقل رصيد</div>
+        <div class="pill" data-ms="deposits" onclick="setMS(this)">الإيداعات</div>
+        <div class="pill" data-ms="withdrawals" onclick="setMS(this)">السحوبات</div>
+        <div class="pill" data-ms="debt" onclick="setMS(this)">المديونية</div>
+        <div class="pill" data-ms="date" onclick="setMS(this)">الانضمام</div>
+      </div>
+    </div>
+    <div style="padding:10px 16px 0"><div class="card" id="m-list"></div></div>
+  </div>
+
+  <!-- ════════════ TRANSACTIONS ════════════ -->
+  <div class="screen" id="s-tx">
+    <div class="sub-ph" style="display:flex;align-items:center;justify-content:space-between;padding-left:16px">
+      <div><h1>المعاملات</h1><p id="tx-hdr">0 معاملة</p></div>
+      <button onclick="openTxSheet()" style="background:rgba(255,255,255,.2);border:1.5px solid rgba(255,255,255,.5);color:#fff;border-radius:12px;padding:8px 14px;font-size:13px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:6px;font-family:'Cairo',sans-serif">
+        <span style="font-size:18px;line-height:1">+</span> تسجيل
+      </button>
+    </div>
+    <div class="search-wrap">
+      <div class="si-wrap"><i class="fas fa-search"></i><input class="si" id="tx-search" placeholder="بحث بالاسم أو المبلغ أو الملاحظة..." oninput="renderTx()"></div>
+      <div class="fp">
+        <div class="pill act" data-tf="all" onclick="setTF(this)">الكل</div>
+        <div class="pill" data-tf="deposit" onclick="setTF(this)">إيداعات</div>
+        <div class="pill" data-tf="withdraw" onclick="setTF(this)">سحوبات</div>
+      </div>
+    </div>
+    <div class="plbl" id="yr-lbl"><i class="fas fa-calendar-alt" style="font-size:10px"></i>السنة</div>
+    <div class="pbar" id="yr-bar"></div>
+    <div class="plbl" id="mo-lbl" style="display:none"><i class="fas fa-calendar" style="font-size:10px"></i>الشهر</div>
+    <div class="pbar" id="mo-bar"></div>
+    <div class="sort-bar">
+      <span style="font-size:11px;color:var(--text3);font-weight:600">ترتيب:</span>
+      <select id="tx-sort" onchange="renderTx()">
+        <option value="date-d">الأحدث أولاً</option>
+        <option value="date-a">الأقدم أولاً</option>
+        <option value="amt-d">أعلى مبلغ</option>
+        <option value="amt-a">أقل مبلغ</option>
+      </select>
+    </div>
+    <div style="padding:6px 16px 0"><div class="card" id="tx-list"></div></div>
+  </div>
+
+  <!-- ════════════ REPORTS ════════════ -->
+  <div class="screen" id="s-reports">
+    <div class="sub-ph"><h1>التقارير المالية</h1><p>إحصائيات وكشوفات الجمعية</p></div>
+    <div style="padding:12px 16px 0">
+      <div class="tab-row">
+        <button class="tab-b act" onclick="showRT('ov',this)">نظرة عامة</button>
+        <button class="tab-b" onclick="showRT('mem',this)">المساهمون</button>
+        <button class="tab-b" onclick="showRT('per',this)">حسب الفترة</button>
+      </div>
+      <div id="rt-ov">
+        <div class="ms-grid" style="padding:0 0 8px">
+          <div class="ms"><div class="ms-lbl">إجمالي الإيداعات</div><div class="ms-val mv-g" id="r-dep">0</div></div>
+          <div class="ms"><div class="ms-lbl">إجمالي السحوبات</div><div class="ms-val mv-r" id="r-wd">0</div></div>
+          <div class="ms"><div class="ms-lbl">صافي الرصيد</div><div class="ms-val mv-b" id="r-net">0</div></div>
+          <div class="ms"><div class="ms-lbl">مساهمون بدين</div><div class="ms-val mv-r" id="r-debt">0</div></div>
+        </div>
+        <div class="chart-box" style="margin-bottom:10px">
+          <div class="ct">نسب المساهمة</div>
+          <div style="position:relative;height:210px"><canvas id="pieChart"></canvas></div>
+        </div>
+        <div class="chart-box">
+          <div class="ct">مقارنة الإيداعات والسحوبات</div>
+          <div style="position:relative;height:190px"><canvas id="barChart"></canvas></div>
+        </div>
+      </div>
+      <div id="rt-mem" style="display:none">
+        <div class="sort-bar" style="padding:0 0 8px">
+          <span style="font-size:11px;color:var(--text3);font-weight:600">ترتيب:</span>
+          <select id="r-msort" onchange="renderRptM()">
+            <option value="deposits">الإيداعات</option>
+            <option value="withdrawals">السحوبات</option>
+            <option value="balance">الرصيد</option>
+            <option value="name">الاسم</option>
+          </select>
+        </div>
+        <div id="r-mgrid"></div>
+      </div>
+      <div id="rt-per" style="display:none">
+        <div class="tab-row" style="margin-bottom:8px">
+          <button class="tab-b act" onclick="showPT('yr',this)">سنوي</button>
+          <button class="tab-b" onclick="showPT('mo',this)">شهري</button>
+        </div>
+        <div id="pt-yr">
+          <div class="sort-bar" style="padding:0 0 7px">
+            <span style="font-size:11px;color:var(--text3);font-weight:600">السنة:</span>
+            <select id="r-yr" onchange="renderYR()"></select>
+          </div>
+          <div id="yr-content"></div>
+        </div>
+        <div id="pt-mo" style="display:none">
+          <div class="frow" style="margin-bottom:8px">
+            <select class="fs" id="r-myr" onchange="renderMR()" style="padding:8px 10px;font-size:12px"></select>
+            <select class="fs" id="r-mo" onchange="renderMR()" style="padding:8px 10px;font-size:12px">
+              <option value="">كل الأشهر</option>
+              <option value="01">يناير</option><option value="02">فبراير</option><option value="03">مارس</option>
+              <option value="04">أبريل</option><option value="05">مايو</option><option value="06">يونيو</option>
+              <option value="07">يوليو</option><option value="08">أغسطس</option><option value="09">سبتمبر</option>
+              <option value="10">أكتوبر</option><option value="11">نوفمبر</option><option value="12">ديسمبر</option>
+            </select>
+          </div>
+          <div id="mo-content"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════════ WHATSAPP ════════════ -->
+  <div class="screen" id="s-wa">
+    <div class="sub-ph"><h1>رسائل واتساب</h1><p>إشعارات وكشوفات للمساهمين</p></div>
+    <div style="padding:12px 16px 0">
+      <div class="tab-row">
+        <button class="tab-b act" onclick="showWT('s',this)">إشعار فردي</button>
+        <button class="tab-b" onclick="showWT('st',this)">كشف حساب</button>
+        <button class="tab-b" onclick="showWT('bc',this)">جماعي</button>
+      </div>
+      <div id="wt-s">
+        <div class="fg"><label class="fl">المساهم</label><select class="fs" id="wa-m"></select></div>
+        <div class="fg"><label class="fl">نوع الإشعار</label>
+          <div class="type-sel">
+            <button class="tb sd" onclick="setWT('deposit',this)">إيداع</button>
+            <button class="tb" onclick="setWT('withdraw',this)">سحب</button>
+            <button class="tb" onclick="setWT('balance',this)">رصيد</button>
+          </div>
+        </div>
+        <div class="fg" id="wa-ag"><label class="fl">المبلغ (ر.ع)</label><input class="fi" id="wa-amt" type="number" placeholder="0.000" step="0.001" min="0"></div>
+        <button class="btn-p" onclick="genWA()">توليد الرسالة</button>
+        <div id="wa-out"></div>
+      </div>
+      <div id="wt-st" style="display:none">
+        <div class="fg"><label class="fl">اختر المساهم</label><select class="fs" id="wa-sm"></select></div>
+        <button class="btn-p" onclick="genStmt()">توليد كشف الحساب</button>
+        <div id="wa-sout"></div>
+      </div>
+      <div id="wt-bc" style="display:none">
+        <p style="font-size:12px;color:var(--text2);margin-bottom:12px;line-height:1.7">إرسال إشعار الرصيد لجميع المساهمين دفعة واحدة.</p>
+        <div id="wa-bclist"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════════ SETTINGS ════════════ -->
+  <div class="screen" id="s-cfg">
+    <div class="sub-ph"><h1>الإعدادات</h1><p>إدارة التطبيق والبيانات</p></div>
+    <div style="padding:14px 16px">
+      <div class="cfg-sec">
+        <div class="cfg-hdr">معلومات التطبيق</div>
+        <div class="cfg-row"><span class="cfg-lbl">اسم الجمعية</span><span class="cfg-val">الجمعية المالية الأسرية</span></div>
+        <div class="cfg-row"><span class="cfg-lbl">عدد المساهمين</span><span class="cfg-val mv-b" id="cfg-m">0</span></div>
+        <div class="cfg-row"><span class="cfg-lbl">إجمالي المعاملات</span><span class="cfg-val mv-a" id="cfg-t">0</span></div>
+        <div class="cfg-row"><span class="cfg-lbl">صافي الرصيد</span><span class="cfg-val mv-g" id="cfg-bal">0 ر.ع</span></div>
+        <div class="cfg-row"><span class="cfg-lbl">العملة</span><span class="cfg-val">ريال عماني (ر.ع)</span></div>
+        <div class="cfg-row"><span class="cfg-lbl">حالة Firebase</span><span class="cfg-val" id="cfg-fb">جاري الفحص...</span></div>
+      </div>
+      <div class="cfg-sec">
+        <div class="cfg-hdr">مزامنة وتصدير</div>
+        <div style="padding:12px 15px;display:flex;flex-direction:column;gap:8px">
+          <button onclick="syncNow()" style="width:100%;background:var(--primary-l);color:var(--primary);border:none;border-radius:11px;padding:12px;font-size:13px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:7px"><i class="fas fa-sync-alt"></i>مزامنة يدوية مع Firebase</button>
+          <button onclick="exportJSON()" style="width:100%;background:var(--amber-bg);color:var(--amber);border:none;border-radius:11px;padding:12px;font-size:13px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:7px"><i class="fas fa-download"></i>تصدير نسخة احتياطية (JSON)</button>
+          <button onclick="exportCSV()" style="width:100%;background:var(--green-bg);color:var(--green);border:none;border-radius:11px;padding:12px;font-size:13px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:7px"><i class="fas fa-file-csv"></i>تصدير المعاملات (CSV)</button>
+          <button onclick="importJSON()" style="width:100%;background:var(--purple-bg);color:var(--purple);border:none;border-radius:11px;padding:12px;font-size:13px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:7px"><i class="fas fa-upload"></i>استيراد نسخة احتياطية</button>
+          <input type="file" id="import-file" accept=".json" style="display:none" onchange="handleImport(event)">
+        </div>
+      </div>
+      <div class="cfg-sec" style="border:1.5px solid var(--red-bg)">
+        <div class="cfg-hdr" style="background:var(--red-bg);color:var(--red)">⚠️ منطقة الخطر</div>
+        <div style="padding:13px 15px">
+          <p style="font-size:11px;color:var(--text2);line-height:1.7;margin-bottom:10px">سيؤدي مسح البيانات إلى حذف جميع المساهمين والمعاملات نهائياً من التطبيق وFirebase.</p>
+          <button onclick="openSheet('ov-reset')" style="width:100%;background:var(--red);color:#fff;border:none;border-radius:11px;padding:13px;font-size:14px;font-weight:700;cursor:pointer;box-shadow:0 4px 14px rgba(224,122,95,.35)"><i class="fas fa-trash-alt" style="margin-left:7px"></i>مسح جميع البيانات</button>
+        </div>
+      </div>
+      <div style="text-align:center;padding:16px 0 6px;color:var(--text3);font-size:10px">الجمعية المالية الأسرية • سلطنة عُمان • v2.0</div>
+    </div>
+  </div>
+
+ </div><!-- /mc -->
+
+ <!-- BOTTOM NAV -->
+ <div id="bnav">
+  <div class="ni active" onclick="goTo('s-home')"><i class="fas fa-home"></i><span>الرئيسية</span></div>
+  <div class="ni" onclick="goTo('s-members')"><i class="fas fa-users"></i><span>المساهمون</span></div>
+  <div class="ni" onclick="goTo('s-tx')"><i class="fas fa-exchange-alt"></i><span>المعاملات</span></div>
+  <div class="ni" onclick="goTo('s-reports')"><i class="fas fa-chart-pie"></i><span>التقارير</span></div>
+  <div class="ni" onclick="goTo('s-wa')"><i class="fab fa-whatsapp"></i><span>واتساب</span></div>
+  <div class="ni" onclick="goTo('s-cfg')"><i class="fas fa-cog"></i><span>الإعدادات</span></div>
+ </div>
+</div><!-- /app -->
+
+<!-- FAB -->
+<button id="main-add-btn" onclick="openSheet('ov-fab')" style="position:fixed;bottom:calc(72px + 14px);left:20px;width:56px;height:56px;border-radius:50%;background:#4F7CAC;color:#fff;border:none;font-size:28px;font-weight:300;cursor:pointer;box-shadow:0 4px 20px rgba(79,124,172,.45);display:flex;align-items:center;justify-content:center;z-index:9999;line-height:1;font-family:sans-serif">+</button>
+
+<!-- ════ OVERLAYS ════ -->
+
+<!-- FAB Menu -->
+<div class="ov" id="ov-fab" onclick="if(event.target===this)closeSheet('ov-fab')">
+ <div class="sheet">
+  <div class="sh"></div>
+  <div class="sbody">
+   <div style="display:flex;flex-direction:column;gap:9px;padding-top:6px">
+    <button class="btn-p g" onclick="closeSheet('ov-fab');openTxSheet()"><i class="fas fa-plus" style="margin-left:7px"></i>تسجيل معاملة جديدة</button>
+    <button class="btn-p" onclick="closeSheet('ov-fab');openMemberSheet()"><i class="fas fa-user-plus" style="margin-left:7px"></i>إضافة مساهم جديد</button>
+    <button class="btn-o" onclick="closeSheet('ov-fab')">إلغاء</button>
+   </div>
+  </div>
+ </div>
+</div>
+
+<!-- Add/Edit Member -->
+<div class="ov" id="ov-member" onclick="if(event.target===this)closeSheet('ov-member')">
+ <div class="sheet">
+  <div class="sh"></div>
+  <div class="shdr"><div class="shtitle" id="mem-sh-title">إضافة مساهم جديد</div><button class="shclose" onclick="closeSheet('ov-member')"><i class="fas fa-times"></i></button></div>
+  <div class="sbody">
+   <div class="fg"><label class="fl">الاسم الكامل *</label><input class="fi" id="m-name" placeholder="اسم المساهم الكامل"></div>
+   <div class="fg"><label class="fl">رقم الهاتف / واتساب *</label><input class="fi" id="m-phone" placeholder="968xxxxxxxx" type="tel"></div>
+   <div class="frow">
+    <div class="fg"><label class="fl">رقم الهوية</label><input class="fi" id="m-nid" placeholder="اختياري"></div>
+    <div class="fg"><label class="fl">تاريخ الانضمام *</label><input class="fi fs" id="m-date" type="date"></div>
+   </div>
+   <div class="fg"><label class="fl">ملاحظة</label><input class="fi" id="m-note" placeholder="ملاحظة اختيارية..."></div>
+   <div class="brow">
+    <button class="btn-p" id="mem-sh-btn" onclick="saveMember()">إضافة المساهم</button>
+    <button class="btn-o" onclick="closeSheet('ov-member')">إلغاء</button>
+   </div>
+  </div>
+ </div>
+</div>
+
+<!-- Add Transaction -->
+<div class="ov" id="ov-tx" onclick="if(event.target===this)closeSheet('ov-tx')">
+ <div class="sheet">
+  <div class="sh"></div>
+  <div class="shdr"><div class="shtitle">تسجيل معاملة جديدة</div><button class="shclose" onclick="closeSheet('ov-tx')"><i class="fas fa-times"></i></button></div>
+  <div class="sbody">
+   <div class="fg"><label class="fl">نوع المعاملة</label>
+    <div class="type-sel">
+     <button class="tb sd" id="t-dep" onclick="selTT('deposit')">💚 إيداع</button>
+     <button class="tb" id="t-wd" onclick="selTT('withdraw')">🔴 سحب / قرض</button>
+    </div>
+   </div>
+   <div id="debt-note" style="display:none;background:var(--amber-bg);border:1px solid var(--amber);border-radius:9px;padding:8px 12px;font-size:11px;color:var(--amber);margin-bottom:11px;font-weight:600">⚠️ إذا تجاوز السحب الرصيد المتاح، يُسجَّل الفرق كدين ويصبح الرصيد سالباً</div>
+   <div class="fg"><label class="fl">المساهم *</label><select class="fs" id="t-member" onchange="updateBHint()"></select></div>
+   <div id="b-hint" style="display:none;font-size:11px;color:var(--text2);margin:-7px 0 10px;padding:7px 11px;background:var(--surface2);border-radius:8px"></div>
+   <div class="frow">
+    <div class="fg"><label class="fl">المبلغ (ر.ع) *</label><input class="fi" id="t-amt" type="number" placeholder="0.000" step="0.001" min="0"></div>
+    <div class="fg"><label class="fl">التاريخ *</label><input class="fi fs" id="t-date" type="date"></div>
+   </div>
+   <div class="fg"><label class="fl">ملاحظة</label><input class="fi" id="t-note" placeholder="وصف اختياري..."></div>
+   <div class="brow">
+    <button class="btn-p g" onclick="saveTx(false)">تسجيل المعاملة</button>
+    <button class="btn-o" onclick="saveTx(true)" style="font-size:12px"><i class="fab fa-whatsapp" style="color:#25D366"></i> + واتساب</button>
+   </div>
+  </div>
+ </div>
+</div>
+
+<!-- Member Detail -->
+<div class="ov" id="ov-detail" onclick="if(event.target===this)closeSheet('ov-detail')">
+ <div class="sheet" id="detail-body"></div>
+</div>
+
+<!-- Delete TX confirm -->
+<div class="ov" id="ov-deltx" onclick="if(event.target===this)closeSheet('ov-deltx')">
+ <div class="sheet">
+  <div class="sh"></div>
+  <div class="sbody">
+   <div class="confirm-box">
+    <div class="confirm-icon">🗑️</div>
+    <div class="confirm-title" style="color:var(--red)">حذف المعاملة</div>
+    <div class="confirm-msg" id="deltx-msg">هل تريد حذف هذه المعاملة نهائياً؟</div>
+   </div>
+   <button class="btn-p r" onclick="confirmDelTx()">نعم، احذف المعاملة</button>
+   <button class="btn-o" style="width:100%;margin-top:9px" onclick="closeSheet('ov-deltx')">إلغاء</button>
+  </div>
+ </div>
+</div>
+
+<!-- Delete Member confirm -->
+<div class="ov" id="ov-delm" onclick="if(event.target===this)closeSheet('ov-delm')">
+ <div class="sheet">
+  <div class="sh"></div>
+  <div class="sbody">
+   <div class="confirm-box" id="delm-box"></div>
+   <div id="delm-btns"></div>
+  </div>
+ </div>
+</div>
+
+<!-- Reset confirm -->
+<div class="ov" id="ov-reset" onclick="if(event.target===this)closeSheet('ov-reset')">
+ <div class="sheet">
+  <div class="sh"></div>
+  <div class="sbody">
+   <div class="confirm-box">
+    <div class="confirm-icon">⚠️</div>
+    <div class="confirm-title" style="color:var(--red)">مسح جميع البيانات</div>
+    <div class="confirm-msg">سيتم حذف جميع المساهمين والمعاملات نهائياً من التطبيق ومن Firebase. هذا الإجراء لا يمكن التراجع عنه.</div>
+   </div>
+   <button class="btn-p r" onclick="doReset()"><i class="fas fa-trash-alt" style="margin-left:7px"></i>نعم، احذف كل البيانات</button>
+   <button class="btn-o" style="width:100%;margin-top:9px" onclick="closeSheet('ov-reset')">إلغاء</button>
+  </div>
+ </div>
+</div>
+
+<script>
+'use strict';
+// ═══════════════════════════════════════════════
+//  FIREBASE CONFIG  — ضع إعداداتك هنا
+// ═══════════════════════════════════════════════
+const FB_CFG = {
+  apiKey: "AIzaSyAMUSqEnyuljpIIlmMBPaxn4zoO9Ka88js",
+  authDomain: "family-finance-pwa-39c21.firebaseapp.com",
+  projectId: "family-finance-pwa-39c21",
+  storageBucket: "family-finance-pwa-39c21.firebasestorage.app",
+  messagingSenderId: "85276467054",
+  appId: "1:85276467054:web:485affb7691236ef41eb7f",
+  measurementId: "G-KTF4YPGN4J"
+};
+
+// ═══════════════════════════════════════════════
+//  STATE
+// ═══════════════════════════════════════════════
+let M=[], T=[];
+let nextMid=1, nextTid=1;
+let mSortKey='name', txFType='all', txFYear='all', txFMonth='all';
+let txTypeSelected='deposit', waTypeSelected='deposit';
+let editingMid=null, pendingDelTxId=null, pendingDelMid=null;
+let homeCI=null, pieCI=null, barCI=null;
+let db=null, isOnline=navigator.onLine;
+let _fb={};
+
+// ═══════════════════════════════════════════════
+//  CONSTANTS
+// ═══════════════════════════════════════════════
+const COLORS=['#4F7CAC','#52B788','#D4A843','#E07A5F','#8B6FCE','#2A9D8F','#C0737A','#457B9D','#E9C46A','#264653'];
+const MO_AR=['يناير','فبراير','مارس','أبريل','مايو','يونيو','يوليو','أغسطس','سبتمبر','أكتوبر','نوفمبر','ديسمبر'];
+const LS={M:'fam_m',T:'fam_t',MID:'fam_mid',TID:'fam_tid'};
+
+// ═══════════════════════════════════════════════
+//  UTILS
+// ═══════════════════════════════════════════════
+const fmt  = n => Number(n).toLocaleString('ar-OM',{minimumFractionDigits:3,maximumFractionDigits:3});
+const today= ()=> new Date().toISOString().slice(0,10);
+const ini  = n => (n||'').trim().charAt(0).toUpperCase();
+const moN  = m => MO_AR[parseInt(m)-1];
+const allYrs=()=>[...new Set(T.map(t=>t.date.slice(0,4)))].sort().reverse();
+const getM = id=> M.find(x=>x.id===id);
+const toast= (msg,dur=2800)=>{const el=document.getElementById('toast');el.textContent=msg;el.classList.add('show');setTimeout(()=>el.classList.remove('show'),dur);};
+
+function stats(mid){
+  const txs=T.filter(t=>t.memberId===mid);
+  const dep=txs.filter(t=>t.type==='deposit').reduce((s,t)=>s+t.amount,0);
+  const wd =txs.filter(t=>t.type==='withdraw').reduce((s,t)=>s+t.amount,0);
+  return{dep,wd,bal:dep-wd,count:txs.length,txs};
+}
+
+// ═══════════════════════════════════════════════
+//  LOCAL STORAGE
+// ═══════════════════════════════════════════════
+function saveLocal(){
+  localStorage.setItem(LS.M,  JSON.stringify(M));
+  localStorage.setItem(LS.T,  JSON.stringify(T));
+  localStorage.setItem(LS.MID,nextMid);
+  localStorage.setItem(LS.TID,nextTid);
+}
+function loadLocal(){
+  M      =JSON.parse(localStorage.getItem(LS.M) ||'[]');
+  T      =JSON.parse(localStorage.getItem(LS.T) ||'[]');
+  nextMid=+localStorage.getItem(LS.MID)||1;
+  nextTid=+localStorage.getItem(LS.TID)||1;
+}
+
+// ═══════════════════════════════════════════════
+//  FIREBASE
+// ═══════════════════════════════════════════════
+async function initFirebase(){
+  if(FB_CFG.apiKey==='YOUR_API_KEY'){
+    updateFBStatus();return;
+  }
+  try{
+    const {initializeApp}=await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js');
+    const fb=await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
+    _fb=fb;
+    const app=initializeApp(FB_CFG);
+    db=fb.getFirestore(app);
+    // Enable offline persistence
+    try{
+      await fb.enableIndexedDbPersistence(db);
+    }catch(e){console.warn('Persistence:',e.code);}
+    await syncFromFirebase();
+    updateFBStatus();
+    toast('🔥 متصل بـ Firebase');
+  }catch(e){
+    console.warn('Firebase error:',e);
+    updateFBStatus();
+  }
+}
+
+async function syncFromFirebase(){
+  if(!db||!_fb.getDocs)return;
+  try{
+    const[mSnap,tSnap]=await Promise.all([
+      _fb.getDocs(_fb.collection(db,'members')),
+      _fb.getDocs(_fb.collection(db,'transactions'))
+    ]);
+    const fbM=mSnap.docs.map(d=>({...d.data(),id:+d.id}));
+    const fbT=tSnap.docs.map(d=>({...d.data(),id:+d.id}));
+    if(fbM.length||fbT.length){
+      M=fbM; T=fbT;
+      nextMid=M.length?Math.max(...M.map(x=>x.id))+1:1;
+      nextTid=T.length?Math.max(...T.map(x=>x.id))+1:1;
+      saveLocal();
+      renderHome();
+      toast('✅ تم تحميل البيانات من Firebase');
+    }
+  }catch(e){console.warn('syncFrom:',e);}
+}
+
+async function pushToFirebase(){
+  if(!db||!_fb.writeBatch)return;
+  try{
+    const batch=_fb.writeBatch(db);
+    M.forEach(m=>batch.set(_fb.doc(_fb.collection(db,'members'),String(m.id)),m));
+    T.forEach(t=>batch.set(_fb.doc(_fb.collection(db,'transactions'),String(t.id)),t));
+    await batch.commit();
+  }catch(e){console.warn('pushTo:',e);}
+}
+
+async function delFromFirebase(col,id){
+  if(!db||!_fb.deleteDoc)return;
+  try{
+    await _fb.deleteDoc(_fb.doc(_fb.collection(db,col),String(id)));
+  }catch(e){console.warn('delFrom:',e);}
+}
+
+async function delMemberFromFirebase(mid){
+  if(!db||!_fb.writeBatch)return;
+  try{
+    const batch=_fb.writeBatch(db);
+    const mTxIds=T.filter(t=>t.memberId===mid).map(t=>t.id);
+    batch.delete(_fb.doc(_fb.collection(db,'members'),String(mid)));
+    mTxIds.forEach(id=>batch.delete(_fb.doc(_fb.collection(db,'transactions'),String(id))));
+    await batch.commit();
+  }catch(e){console.warn('delMember:',e);}
+}
+
+async function save(){
+  saveLocal();
+  if(isOnline&&db)await pushToFirebase().catch(()=>{});
+}
+
+async function syncNow(){
+  if(!isOnline){toast('⚠️ لا يوجد اتصال بالإنترنت');return;}
+  if(!db){toast('⚠️ Firebase غير مُعدَّل — راجع الإعدادات');return;}
+  toast('⏳ جاري المزامنة...',1500);
+  await pushToFirebase();
+  toast('✅ تمت المزامنة بنجاح');
+  renderSettings();
+}
+
+function updateFBStatus(){
+  const el=document.getElementById('cfg-fb');
+  if(!el)return;
+  if(FB_CFG.apiKey==='YOUR_API_KEY') el.innerHTML='<span style="color:var(--amber)">⚠️ غير مُعدَّل — محلي فقط</span>';
+  else if(!db) el.innerHTML='<span style="color:var(--red)">🔴 خطأ في الاتصال</span>';
+  else if(isOnline) el.innerHTML='<span style="color:var(--green)">🟢 متصل — مزامنة تلقائية</span>';
+  else el.innerHTML='<span style="color:var(--red)">🔴 غير متصل — حفظ محلي</span>';
+}
+
+// ═══════════════════════════════════════════════
+//  CONNECTIVITY
+// ═══════════════════════════════════════════════
+window.addEventListener('online', ()=>{
+  isOnline=true;
+  document.getElementById('offline-bar').style.display='none';
+  updateFBStatus();
+  if(db)pushToFirebase().catch(()=>{});
+});
+window.addEventListener('offline',()=>{
+  isOnline=false;
+  document.getElementById('offline-bar').style.display='flex';
+  updateFBStatus();
+});
+
+// ═══════════════════════════════════════════════
+//  NAVIGATION
+// ═══════════════════════════════════════════════
+const NAV_MAP={'s-home':0,'s-members':1,'s-tx':2,'s-reports':3,'s-wa':4,'s-cfg':5};
+function goTo(sid){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.ni').forEach(n=>n.classList.remove('active'));
+  document.getElementById(sid).classList.add('active');
+  document.getElementById('mc').scrollTop=0;
+  const idx=NAV_MAP[sid];
+  if(idx!==undefined)document.querySelectorAll('.ni')[idx].classList.add('active');
+  if(sid==='s-home')    renderHome();
+  if(sid==='s-members') renderMembers();
+  if(sid==='s-tx')      {fillTxMembers();buildYrBar();renderTx();}
+  if(sid==='s-reports') renderReports();
+  if(sid==='s-wa')      fillWASelects();
+  if(sid==='s-cfg')     renderSettings();
+}
+const openSheet =id=>document.getElementById(id).classList.add('show');
+const closeSheet=id=>document.getElementById(id).classList.remove('show');
+
+// ═══════════════════════════════════════════════
+//  HOME
+// ═══════════════════════════════════════════════
+function renderHome(){
+  const dep=T.filter(t=>t.type==='deposit' ).reduce((s,t)=>s+t.amount,0);
+  const wd =T.filter(t=>t.type==='withdraw').reduce((s,t)=>s+t.amount,0);
+  document.getElementById('h-bal').innerHTML=fmt(dep-wd)+' <span>ر.ع</span>';
+  document.getElementById('h-dep').textContent=fmt(dep)+' ر.ع';
+  document.getElementById('h-wd' ).textContent=fmt(wd) +' ر.ع';
+  document.getElementById('h-mc' ).textContent=M.length;
+  document.getElementById('h-tc' ).textContent=T.length;
+  const topM=M.map(m=>({...m,...stats(m.id)})).sort((a,b)=>b.dep-a.dep)[0];
+  document.getElementById('h-top').textContent=topM?topM.name.split(' ').slice(0,2).join(' '):'-';
+  const mo=today().slice(0,7);
+  const moDep=T.filter(t=>t.date.startsWith(mo)&&t.type==='deposit').reduce((s,t)=>s+t.amount,0);
+  document.getElementById('h-mo').textContent=fmt(moDep)+' ر.ع';
+  const recent=[...T].sort((a,b)=>new Date(b.date)-new Date(a.date)).slice(0,5);
+  document.getElementById('h-recent').innerHTML=recent.length?recent.map(txHTML).join(''):'<div class="empty"><i class="fas fa-inbox"></i><p>لا توجد معاملات بعد</p></div>';
+  document.getElementById('h-mlist').innerHTML=M.slice(0,4).map(memberRowHTML).join('');
+  renderHomeChart();
+}
+
+function txHTML(t,showDel=false){
+  const m=getM(t.memberId);
+  const dep=t.type==='deposit';
+  return`<div class="tx-row" onclick="if(event.target.closest('.tx-del'))return;void(0)">
+    <div class="tx-ico ${dep?'dep':'wd'}"><i class="fas fa-${dep?'arrow-down':'arrow-up'}"></i></div>
+    <div class="tx-info">
+      <div class="tx-nm">${m?m.name.split(' ').slice(0,2).join(' '):'محذوف'}</div>
+      <div class="tx-nt">${t.note||t.date}</div>
+    </div>
+    <div class="tx-right">
+      <div class="tx-val ${dep?'dv':'wv'}">${dep?'+':'-'}${fmt(t.amount)}</div>
+      <div class="tx-dt">${t.date}</div>
+    </div>
+    ${showDel?`<button class="tx-del" onclick="reqDelTx(${t.id})" style="background:var(--red-bg);color:var(--red);border:none;border-radius:8px;padding:6px 9px;font-size:11px;cursor:pointer;margin-right:4px;flex-shrink:0"><i class="fas fa-trash"></i></button>`:''}
+  </div>`;
+}
+
+function memberRowHTML(m){
+  const s=stats(m.id);
+  const debt=s.bal<0;
+  return`<div class="mr" onclick="openDetail(${m.id})">
+    <div class="av" style="background:${m.color||COLORS[0]}">${ini(m.name)}</div>
+    <div class="mi">
+      <div class="mn">${m.name}</div>
+      <div class="ms2">${s.count} معاملة • إيداع: ${fmt(s.dep)} ر.ع${debt?` • <span style="color:var(--red)">مدين</span>`:''}</div>
+    </div>
+    <div class="mb">
+      <div class="mb-n" style="color:${debt?'var(--red)':'var(--green)'}">${fmt(s.bal)}</div>
+      <div class="mb-l">${debt?'دين':'ر.ع'}</div>
+    </div>
+  </div>`;
+}
+
+function renderHomeChart(){
+  const ctx=document.getElementById('homeChart');
+  if(!ctx)return;
+  if(homeCI)homeCI.destroy();
+  homeCI=new Chart(ctx,{type:'bar',data:{
+    labels:M.map(m=>m.name.split(' ')[0]),
+    datasets:[
+      {label:'إيداعات',data:M.map(m=>stats(m.id).dep),backgroundColor:'rgba(82,183,136,.75)',borderRadius:5,borderSkipped:false},
+      {label:'سحوبات', data:M.map(m=>stats(m.id).wd), backgroundColor:'rgba(224,122,95,.65)',borderRadius:5,borderSkipped:false}
+    ]
+  },options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},
+    scales:{x:{ticks:{font:{size:9},color:'#9AAABB'},grid:{display:false}},
+            y:{ticks:{font:{size:9},color:'#9AAABB',callback:v=>fmt(v)},grid:{color:'rgba(0,0,0,.04)'}}}}});
+}
+
+// ═══════════════════════════════════════════════
+//  MEMBERS
+// ═══════════════════════════════════════════════
+let mSortK='name';
+function setMS(el){
+  document.querySelectorAll('[data-ms]').forEach(p=>p.classList.remove('act'));
+  el.classList.add('act'); mSortK=el.dataset.ms; renderMembers();
+}
+function renderMembers(){
+  const q=(document.getElementById('m-search').value||'').toLowerCase();
+  let list=[...M];
+  if(q)list=list.filter(m=>m.name.toLowerCase().includes(q)||m.phone.includes(q));
+  list.sort((a,b)=>{
+    const sa=stats(a.id),sb=stats(b.id);
+    if(mSortK==='name')      return a.name.localeCompare(b.name,'ar');
+    if(mSortK==='balance-d') return sb.bal-sa.bal;
+    if(mSortK==='balance-a') return sa.bal-sb.bal;
+    if(mSortK==='deposits')  return sb.dep-sa.dep;
+    if(mSortK==='withdrawals')return sb.wd-sa.wd;
+    if(mSortK==='debt')      return sa.bal-sb.bal;
+    if(mSortK==='date')      return new Date(a.date)-new Date(b.date);
+  });
+  document.getElementById('m-hdr').textContent=list.length+' مساهم';
+  document.getElementById('m-list').innerHTML=list.length
+    ?list.map(memberRowHTML).join('')
+    :'<div class="empty"><i class="fas fa-user-slash"></i><p>لا يوجد مساهمون</p></div>';
+}
+
+// ── Open Add Member Sheet ──
+function openMemberSheet(mid=null){
+  editingMid=mid;
+  document.getElementById('mem-sh-title').textContent=mid?'تعديل بيانات المساهم':'إضافة مساهم جديد';
+  document.getElementById('mem-sh-btn').textContent=mid?'حفظ التعديلات':'إضافة المساهم';
+  if(mid){
+    const m=getM(mid);
+    document.getElementById('m-name').value=m.name;
+    document.getElementById('m-phone').value=m.phone;
+    document.getElementById('m-nid').value=m.nid||'';
+    document.getElementById('m-date').value=m.date;
+    document.getElementById('m-note').value=m.note||'';
+  }else{
+    ['m-name','m-phone','m-nid','m-note'].forEach(id=>document.getElementById(id).value='');
+    document.getElementById('m-date').value=today();
+  }
+  closeSheet('ov-detail');
+  openSheet('ov-member');
+}
+
+// ── Save Member (Add or Edit) ──
+async function saveMember(){
+  const name =document.getElementById('m-name').value.trim();
+  const phone=document.getElementById('m-phone').value.trim();
+  const nid  =document.getElementById('m-nid').value.trim();
+  const date =document.getElementById('m-date').value;
+  const note =document.getElementById('m-note').value.trim();
+  if(!name||!phone||!date){toast('⚠️ يرجى ملء الحقول المطلوبة');return;}
+  if(editingMid){
+    const idx=M.findIndex(m=>m.id===editingMid);
+    M[idx]={...M[idx],name,phone,nid,date,note};
+    await save();
+    closeSheet('ov-member');
+    renderMembers(); renderHome();
+    toast('✅ تم تعديل بيانات المساهم');
+  }else{
+    M.push({id:nextMid++,name,phone,nid,date,note,color:COLORS[M.length%COLORS.length]});
+    await save();
+    closeSheet('ov-member');
+    renderMembers(); renderHome();
+    toast('✅ تم إضافة المساهم بنجاح');
+  }
+  editingMid=null;
+}
+
+// ── Request Delete Member ──
+function reqDelMember(mid){
+  pendingDelMid=mid;
+  const m=getM(mid);
+  const s=stats(mid);
+  const box=document.getElementById('delm-box');
+  const btns=document.getElementById('delm-btns');
+
+  if(s.dep>0||s.wd>0){
+    // Has transactions — show warning
+    if(s.bal!==0){
+      // Has balance or debt — CANNOT delete
+      box.innerHTML=`
+        <div class="confirm-icon">🚫</div>
+        <div class="confirm-title" style="color:var(--red)">لا يمكن حذف المساهم</div>
+        <div class="confirm-msg">
+          <b>${m.name}</b> لديه ${s.bal>0?`رصيد متبقٍّ: <b style="color:var(--green)">${fmt(s.bal)} ر.ع</b>`:`دين: <b style="color:var(--red)">${fmt(Math.abs(s.bal))} ر.ع</b>`}<br><br>
+          يجب تسوية الرصيد أولاً قبل الحذف.<br>
+          <span style="font-size:10px;color:var(--text3)">أضف سحباً بمقدار الرصيد المتبقي أو إيداعاً لتسوية الدين.</span>
+        </div>`;
+      btns.innerHTML=`<button class="btn-o" style="width:100%" onclick="closeSheet('ov-delm')">فهمت</button>`;
+    }else{
+      // Balance is zero but has transactions — ask to delete with transactions
+      box.innerHTML=`
+        <div class="confirm-icon">🗑️</div>
+        <div class="confirm-title" style="color:var(--red)">حذف المساهم</div>
+        <div class="confirm-msg">
+          رصيد <b>${m.name}</b> = <b>0 ر.ع</b> (مسوَّى).<br>
+          سيتم حذف المساهم و<b>${s.count} معاملة</b> مرتبطة به نهائياً.
+        </div>`;
+      btns.innerHTML=`
+        <button class="btn-p r" onclick="confirmDelMember()">نعم، احذف المساهم</button>
+        <button class="btn-o" style="width:100%;margin-top:9px" onclick="closeSheet('ov-delm')">إلغاء</button>`;
+    }
+  }else{
+    // No transactions at all — can delete freely
+    box.innerHTML=`
+      <div class="confirm-icon">🗑️</div>
+      <div class="confirm-title" style="color:var(--red)">حذف المساهم</div>
+      <div class="confirm-msg">هل تريد حذف <b>${m.name}</b> نهائياً؟ لا توجد معاملات مرتبطة به.</div>`;
+    btns.innerHTML=`
+      <button class="btn-p r" onclick="confirmDelMember()">نعم، احذف</button>
+      <button class="btn-o" style="width:100%;margin-top:9px" onclick="closeSheet('ov-delm')">إلغاء</button>`;
+  }
+  closeSheet('ov-detail');
+  openSheet('ov-delm');
+}
+
+async function confirmDelMember(){
+  if(!pendingDelMid)return;
+  const mid=pendingDelMid;
+  await delMemberFromFirebase(mid);
+  M=M.filter(m=>m.id!==mid);
+  T=T.filter(t=>t.memberId!==mid);
+  saveLocal();
+  pendingDelMid=null;
+  closeSheet('ov-delm');
+  renderMembers(); renderHome();
+  toast('✅ تم حذف المساهم');
+}
+
+// ── Member Detail Sheet ──
+function openDetail(mid){
+  const m=getM(mid);
+  const s=stats(mid);
+  const debt=s.bal<0;
+  const allTx=[...T.filter(t=>t.memberId===mid)].sort((a,b)=>new Date(b.date)-new Date(a.date));
+  const depTx=allTx.filter(t=>t.type==='deposit');
+  const wdTx =allTx.filter(t=>t.type==='withdraw');
+
+  // Running ledger
+  let runBal=0;
+  const ledger=[...allTx].reverse().map(t=>{
+    runBal+=t.type==='deposit'?t.amount:-t.amount;
+    return{t,bal:runBal};
+  }).reverse();
+
+  const ledgerRows=ledger.map(({t,bal})=>`<tr>
+    <td>${t.date}</td>
+    <td><span class="badge ${t.type==='deposit'?'bg':'br'}">${t.type==='deposit'?'إيداع':'سحب'}</span></td>
+    <td style="font-weight:700;color:${t.type==='deposit'?'var(--green)':'var(--red)'}">${t.type==='deposit'?'+':'-'}${fmt(t.amount)}</td>
+    <td style="font-weight:700;color:${bal>=0?'var(--primary)':'var(--red)'}">${fmt(bal)}</td>
+    <td style="color:var(--text3)">${t.note||'-'}</td>
+  </tr>`).join('');
+
+  const depRows=depTx.map(t=>`<tr>
+    <td>${t.date}</td>
+    <td style="font-weight:700;color:var(--green)">+${fmt(t.amount)}</td>
+    <td style="color:var(--text3)">${t.note||'-'}</td>
+  </tr>`).join('');
+
+  const wdRows=wdTx.map(t=>`<tr>
+    <td>${t.date}</td>
+    <td style="font-weight:700;color:var(--red)">-${fmt(t.amount)}</td>
+    <td style="color:var(--text3)">${t.note||'-'}</td>
+  </tr>`).join('');
+
+  document.getElementById('detail-body').innerHTML=`
+    <div class="sh"></div>
+    <div class="shdr">
+      <div class="shtitle">بيانات المساهم</div>
+      <button class="shclose" onclick="closeSheet('ov-detail')"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="dh">
+      <div class="dav" style="background:${m.color||COLORS[0]}">${ini(m.name)}</div>
+      <div class="dn">${m.name}</div>
+      <div class="dp">${m.phone}${m.nid?' • '+m.nid:''}</div>
+      <div style="font-size:11px;color:var(--text3);margin-top:4px">عضو منذ: ${m.date}${m.note?' • '+m.note:''}</div>
+    </div>
+    ${debt?`<div class="debt-warn"><i class="fas fa-exclamation-triangle"></i> دين على هذا المساهم: ${fmt(Math.abs(s.bal))} ر.ع</div>`:''}
+    <div class="dst">
+      <div class="dsc"><div class="dsv" style="color:var(--green)">${fmt(s.dep)}</div><div class="dsl">إجمالي الإيداعات</div></div>
+      <div class="dsc"><div class="dsv" style="color:var(--red)">${fmt(s.wd)}</div><div class="dsl">إجمالي السحوبات</div></div>
+      <div class="dsc"><div class="dsv" style="color:${debt?'var(--red)':'var(--primary)'}">${fmt(s.bal)}</div><div class="dsl">${debt?'الدين':'الرصيد'}</div></div>
+    </div>
+    <!-- Action Buttons -->
+    <div class="m-actions">
+      <button class="act-btn act-edit" onclick="openMemberSheet(${mid})"><i class="fas fa-edit"></i> تعديل</button>
+      <button class="act-btn act-tx"   onclick="closeSheet('ov-detail');openTxSheet(${mid})"><i class="fas fa-plus"></i> معاملة</button>
+      <button class="act-btn act-wa"   onclick="closeSheet('ov-detail');goTo('s-wa');fillWASelects(${mid})"><i class="fab fa-whatsapp"></i> واتساب</button>
+      <button class="act-btn act-del"  onclick="reqDelMember(${mid})"><i class="fas fa-trash"></i> حذف</button>
+    </div>
+    <!-- Detail Tabs -->
+    <div class="dtabs" style="margin-top:10px">
+      <button class="dtab act" onclick="switchDTab('all',this)">كشف كامل</button>
+      <button class="dtab" onclick="switchDTab('dep',this)">الإيداعات (${depTx.length})</button>
+      <button class="dtab" onclick="switchDTab('wd',this)">السحوبات (${wdTx.length})</button>
+    </div>
+    <div class="dtc act" id="dtab-all">
+      <div class="tbl-wrap">
+        <table class="tbl">
+          <thead><tr><th>التاريخ</th><th>النوع</th><th>المبلغ</th><th>الرصيد</th><th>ملاحظة</th></tr></thead>
+          <tbody>${ledgerRows||'<tr><td colspan="5" class="empty" style="padding:20px">لا توجد معاملات</td></tr>'}</tbody>
+        </table>
+      </div>
+    </div>
+    <div class="dtc" id="dtab-dep">
+      <div style="background:var(--green-bg);border-radius:9px;padding:9px 12px;margin-bottom:9px;font-size:12px;color:var(--green);font-weight:700">
+        💚 إجمالي الإيداعات: ${fmt(s.dep)} ر.ع (${depTx.length} عملية)
+      </div>
+      <div class="tbl-wrap">
+        <table class="tbl">
+          <thead><tr><th>التاريخ</th><th>المبلغ</th><th>ملاحظة</th></tr></thead>
+          <tbody>${depRows||'<tr><td colspan="3" style="text-align:center;padding:16px;color:var(--text3)">لا توجد إيداعات</td></tr>'}</tbody>
+        </table>
+      </div>
+    </div>
+    <div class="dtc" id="dtab-wd">
+      <div style="background:var(--red-bg);border-radius:9px;padding:9px 12px;margin-bottom:9px;font-size:12px;color:var(--red);font-weight:700">
+        🔴 إجمالي السحوبات: ${fmt(s.wd)} ر.ع (${wdTx.length} عملية)
+      </div>
+      <div class="tbl-wrap">
+        <table class="tbl">
+          <thead><tr><th>التاريخ</th><th>المبلغ</th><th>ملاحظة</th></tr></thead>
+          <tbody>${wdRows||'<tr><td colspan="3" style="text-align:center;padding:16px;color:var(--text3)">لا توجد سحوبات</td></tr>'}</tbody>
+        </table>
+      </div>
+    </div>
+  `;
+  openSheet('ov-detail');
+}
+
+function switchDTab(tab,el){
+  document.querySelectorAll('.dtab').forEach(b=>b.classList.remove('act'));
+  document.querySelectorAll('.dtc').forEach(c=>c.classList.remove('act'));
+  el.classList.add('act');
+  document.getElementById('dtab-'+tab).classList.add('act');
+}
+
+// ═══════════════════════════════════════════════
+//  TRANSACTIONS
+// ═══════════════════════════════════════════════
+function fillTxMembers(preMid=null){
+  const sel=document.getElementById('t-member');
+  sel.innerHTML=M.map(m=>`<option value="${m.id}">${m.name}</option>`).join('');
+  if(preMid)sel.value=preMid;
+  updateBHint();
+}
+function updateBHint(){
+  const mid=+document.getElementById('t-member').value;
+  const m=getM(mid);
+  const hint=document.getElementById('b-hint');
+  if(!m){hint.style.display='none';return;}
+  const s=stats(mid);
+  hint.style.display='';
+  hint.innerHTML=`💼 رصيد <b>${m.name.split(' ')[0]}</b>: <b style="color:${s.bal>=0?'var(--green)':'var(--red)'}">${fmt(s.bal)} ر.ع</b>${s.bal<0?' (مدين)':''}`;
+}
+
+function openTxSheet(preMid=null){
+  fillTxMembers(preMid);
+  selTT('deposit');
+  document.getElementById('t-amt').value='';
+  document.getElementById('t-note').value='';
+  document.getElementById('t-date').value=today();
+  openSheet('ov-tx');
+}
+
+function selTT(type){
+  txTypeSelected=type;
+  document.getElementById('t-dep').className='tb'+(type==='deposit'?' sd':'');
+  document.getElementById('t-wd' ).className='tb'+(type==='withdraw'?' sw2':'');
+  document.getElementById('debt-note').style.display=type==='withdraw'?'':'none';
+}
+
+async function saveTx(withWA){
+  const mid   =+document.getElementById('t-member').value;
+  const amount=+document.getElementById('t-amt').value;
+  const date  =document.getElementById('t-date').value;
+  const note  =document.getElementById('t-note').value.trim();
+  const type  =txTypeSelected;
+  if(!mid||!amount||!date){toast('⚠️ يرجى ملء الحقول المطلوبة');return;}
+  if(amount<=0){toast('⚠️ المبلغ يجب أن يكون أكبر من صفر');return;}
+  const m=getM(mid);
+  T.push({id:nextTid++,memberId:mid,type,amount,date,note});
+  await save();
+  closeSheet('ov-tx');
+  ['t-amt','t-note'].forEach(id=>document.getElementById(id).value='');
+  const ns=stats(mid);
+  renderTx(); renderHome();
+  toast(`✅ تم تسجيل ${type==='deposit'?'الإيداع':'السحب'}${ns.bal<0?' (رصيد سالب)':''}`);
+  if(withWA){
+    const msg=buildWAMsg(m,type,amount,date,ns.bal);
+    window.open('https://wa.me/'+m.phone+'?text='+encodeURIComponent(msg),'_blank');
+  }
+}
+
+// ── Delete TX ──
+function reqDelTx(tid){
+  pendingDelTxId=tid;
+  const t=T.find(x=>x.id===tid);
+  const m=getM(t.memberId);
+  document.getElementById('deltx-msg').innerHTML=`حذف ${t.type==='deposit'?'إيداع':'سحب'} بمبلغ <b>${fmt(t.amount)} ر.ع</b> بتاريخ ${t.date} لـ <b>${m?m.name:'محذوف'}</b>؟`;
+  openSheet('ov-deltx');
+}
+async function confirmDelTx(){
+  if(!pendingDelTxId)return;
+  await delFromFirebase('transactions',pendingDelTxId);
+  T=T.filter(t=>t.id!==pendingDelTxId);
+  saveLocal();
+  pendingDelTxId=null;
+  closeSheet('ov-deltx');
+  renderTx(); renderHome();
+  toast('✅ تم حذف المعاملة');
+}
+
+// ── Render Transactions ──
+let txFT='all', txFY='all', txFM='all';
+function setTF(el){
+  document.querySelectorAll('[data-tf]').forEach(p=>p.classList.remove('act','act-g','act-r'));
+  el.classList.add('act'); txFT=el.dataset.tf; renderTx();
+}
+function buildYrBar(){
+  const yrs=allYrs();
+  const bar=document.getElementById('yr-bar');
+  bar.innerHTML='<div class="pc act" data-yr="all" onclick="setYr(this)">كل السنوات</div>'+
+    yrs.map(y=>`<div class="pc" data-yr="${y}" onclick="setYr(this)">${y}</div>`).join('');
+  buildMoBar('all');
+}
+function setYr(el){
+  document.querySelectorAll('#yr-bar .pc').forEach(c=>c.classList.remove('act'));
+  el.classList.add('act'); txFY=el.dataset.yr; txFM='all'; buildMoBar(txFY); renderTx();
+}
+function buildMoBar(yr){
+  const lbl=document.getElementById('mo-lbl');
+  const bar=document.getElementById('mo-bar');
+  if(yr==='all'){bar.innerHTML='';lbl.style.display='none';return;}
+  const mos=[...new Set(T.filter(t=>t.date.startsWith(yr)).map(t=>t.date.slice(5,7)))].sort();
+  lbl.style.display='';
+  bar.innerHTML='<div class="pc act" data-mo="all" onclick="setMo(this)">كل الأشهر</div>'+
+    mos.map(mo=>`<div class="pc" data-mo="${mo}" onclick="setMo(this)">${moN(mo)}</div>`).join('');
+}
+function setMo(el){
+  document.querySelectorAll('#mo-bar .pc').forEach(c=>c.classList.remove('act'));
+  el.classList.add('act'); txFM=el.dataset.mo; renderTx();
+}
+function renderTx(){
+  const q=(document.getElementById('tx-search').value||'').toLowerCase();
+  const sk=document.getElementById('tx-sort').value;
+  let list=[...T];
+  if(txFT==='deposit' )list=list.filter(t=>t.type==='deposit');
+  if(txFT==='withdraw')list=list.filter(t=>t.type==='withdraw');
+  if(txFY!=='all')list=list.filter(t=>t.date.startsWith(txFY));
+  if(txFM!=='all')list=list.filter(t=>t.date.slice(5,7)===txFM);
+  if(q)list=list.filter(t=>{
+    const m=getM(t.memberId);
+    return(m&&m.name.toLowerCase().includes(q))||(t.note||'').toLowerCase().includes(q)||(t.amount+'').includes(q);
+  });
+  if(sk==='date-d')list.sort((a,b)=>new Date(b.date)-new Date(a.date));
+  else if(sk==='date-a')list.sort((a,b)=>new Date(a.date)-new Date(b.date));
+  else if(sk==='amt-d')list.sort((a,b)=>b.amount-a.amount);
+  else if(sk==='amt-a')list.sort((a,b)=>a.amount-b.amount);
+  document.getElementById('tx-hdr').textContent=list.length+' معاملة';
+  document.getElementById('tx-list').innerHTML=list.length
+    ?list.map(t=>txHTML(t,true)).join('')
+    :'<div class="empty"><i class="fas fa-inbox"></i><p>لا توجد معاملات</p></div>';
+}
+
+// ═══════════════════════════════════════════════
+//  REPORTS
+// ═══════════════════════════════════════════════
+function showRT(tab,el){
+  document.querySelectorAll('#s-reports .tab-b').forEach(b=>b.classList.remove('act'));
+  el.classList.add('act');
+  ['rt-ov','rt-mem','rt-per'].forEach(id=>document.getElementById(id).style.display=id===`rt-${tab}`?'':'none');
+  if(tab==='mem')renderRptM();
+  if(tab==='per')initPer();
+}
+function renderReports(){
+  const dep=T.filter(t=>t.type==='deposit' ).reduce((s,t)=>s+t.amount,0);
+  const wd =T.filter(t=>t.type==='withdraw').reduce((s,t)=>s+t.amount,0);
+  document.getElementById('r-dep' ).textContent=fmt(dep)+' ر.ع';
+  document.getElementById('r-wd'  ).textContent=fmt(wd) +' ر.ع';
+  document.getElementById('r-net' ).textContent=fmt(dep-wd)+' ر.ع';
+  document.getElementById('r-debt').textContent=M.filter(m=>stats(m.id).bal<0).length+' مساهم';
+  renderPie(); renderBar();
+}
+function renderRptM(){
+  const sk=document.getElementById('r-msort').value;
+  const totDep=T.filter(t=>t.type==='deposit').reduce((s,t)=>s+t.amount,0);
+  let list=[...M];
+  list.sort((a,b)=>{
+    const sa=stats(a.id),sb=stats(b.id);
+    if(sk==='deposits')return sb.dep-sa.dep;
+    if(sk==='withdrawals')return sb.wd-sa.wd;
+    if(sk==='balance')return sb.bal-sa.bal;
+    return a.name.localeCompare(b.name,'ar');
+  });
+  document.getElementById('r-mgrid').innerHTML=list.map(m=>{
+    const s=stats(m.id);const debt=s.bal<0;
+    return`<div class="rmc" onclick="openDetail(${m.id})">
+      <div class="av" style="background:${m.color||COLORS[0]};width:36px;height:36px;font-size:13px">${ini(m.name)}</div>
+      <div class="rm-info">
+        <div class="rm-nm">${m.name}</div>
+        <div class="rm-sub" style="color:${debt?'var(--red)':'var(--green)'}">
+          ${fmt(s.bal)} ر.ع ${debt?'(دين)':''} • ${(totDep>0?s.dep/totDep*100:0).toFixed(1)}%
+        </div>
+        <div style="font-size:10px;color:var(--text3)">إيداعات: ${fmt(s.dep)} | سحوبات: ${fmt(s.wd)}</div>
+      </div>
+      <i class="fas fa-chevron-left" style="color:var(--text3);font-size:12px"></i>
+    </div>`;
+  }).join('');
+}
+function renderPie(){
+  const ctx=document.getElementById('pieChart');if(!ctx)return;
+  if(pieCI)pieCI.destroy();
+  pieCI=new Chart(ctx,{type:'doughnut',data:{
+    labels:M.map(m=>m.name.split(' ').slice(0,2).join(' ')),
+    datasets:[{data:M.map(m=>stats(m.id).dep),backgroundColor:M.map(m=>m.color||COLORS[0]),borderWidth:0}]
+  },options:{responsive:true,maintainAspectRatio:false,cutout:'64%',
+    plugins:{legend:{position:'bottom',labels:{font:{size:10},color:'#5A6A7E',padding:8}}}}});
+}
+function renderBar(){
+  const ctx=document.getElementById('barChart');if(!ctx)return;
+  if(barCI)barCI.destroy();
+  barCI=new Chart(ctx,{type:'bar',data:{
+    labels:M.map(m=>m.name.split(' ')[0]),
+    datasets:[
+      {label:'إيداعات',data:M.map(m=>stats(m.id).dep),backgroundColor:'rgba(82,183,136,.75)',borderRadius:5},
+      {label:'سحوبات', data:M.map(m=>stats(m.id).wd), backgroundColor:'rgba(224,122,95,.65)',borderRadius:5}
+    ]
+  },options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},
+    scales:{x:{ticks:{font:{size:9},color:'#9AAABB'},grid:{display:false}},
+            y:{ticks:{font:{size:9},color:'#9AAABB',callback:v=>fmt(v)},grid:{color:'rgba(0,0,0,.04)'}}}}});
+}
+function initPer(){
+  const yrs=allYrs();
+  document.getElementById('r-yr' ).innerHTML=yrs.map(y=>`<option value="${y}">${y}</option>`).join('');
+  document.getElementById('r-myr').innerHTML=yrs.map(y=>`<option value="${y}">${y}</option>`).join('');
+  renderYR(); renderMR();
+}
+function showPT(t,el){
+  document.querySelectorAll('#rt-per .tab-b').forEach(b=>b.classList.remove('act'));
+  el.classList.add('act');
+  document.getElementById('pt-yr').style.display=t==='yr'?'':'none';
+  document.getElementById('pt-mo').style.display=t==='mo'?'':'none';
+}
+function renderYR(){
+  const yr=document.getElementById('r-yr').value;
+  if(!yr){document.getElementById('yr-content').innerHTML='';return;}
+  const txs=T.filter(t=>t.date.startsWith(yr));
+  const dep=txs.filter(t=>t.type==='deposit' ).reduce((s,t)=>s+t.amount,0);
+  const wd =txs.filter(t=>t.type==='withdraw').reduce((s,t)=>s+t.amount,0);
+  const mos=[...new Set(txs.map(t=>t.date.slice(5,7)))].sort();
+  document.getElementById('yr-content').innerHTML=`
+    <div class="ms-grid" style="padding:0 0 9px">
+      <div class="ms"><div class="ms-lbl">إيداعات ${yr}</div><div class="ms-val mv-g">${fmt(dep)}</div></div>
+      <div class="ms"><div class="ms-lbl">سحوبات ${yr}</div><div class="ms-val mv-r">${fmt(wd)}</div></div>
+      <div class="ms"><div class="ms-lbl">صافي ${yr}</div><div class="ms-val mv-b">${fmt(dep-wd)}</div></div>
+      <div class="ms"><div class="ms-lbl">المعاملات</div><div class="ms-val mv-a">${txs.length}</div></div>
+    </div>
+    <div class="card tbl-wrap">
+      <table class="tbl">
+        <thead><tr><th>الشهر</th><th>الإيداعات</th><th>السحوبات</th><th>الصافي</th></tr></thead>
+        <tbody>${mos.map(mo=>{
+          const mt=txs.filter(t=>t.date.slice(5,7)===mo);
+          const md=mt.filter(t=>t.type==='deposit').reduce((s,t)=>s+t.amount,0);
+          const mw=mt.filter(t=>t.type==='withdraw').reduce((s,t)=>s+t.amount,0);
+          return`<tr><td>${moN(mo)}</td><td style="color:var(--green);font-weight:700">${fmt(md)}</td><td style="color:var(--red)">${fmt(mw)}</td><td style="font-weight:700">${fmt(md-mw)}</td></tr>`;
+        }).join('')||'<tr><td colspan="4" style="text-align:center;padding:16px;color:var(--text3)">لا توجد بيانات</td></tr>'}</tbody>
+      </table>
+    </div>`;
+}
+function renderMR(){
+  const yr=document.getElementById('r-myr').value;
+  const mo=document.getElementById('r-mo').value;
+  if(!yr){document.getElementById('mo-content').innerHTML='';return;}
+  let txs=T.filter(t=>t.date.startsWith(yr));
+  if(mo)txs=txs.filter(t=>t.date.slice(5,7)===mo);
+  const dep=txs.filter(t=>t.type==='deposit').reduce((s,t)=>s+t.amount,0);
+  const wd =txs.filter(t=>t.type==='withdraw').reduce((s,t)=>s+t.amount,0);
+  document.getElementById('mo-content').innerHTML=`
+    <div class="ms-grid" style="padding:0 0 9px">
+      <div class="ms"><div class="ms-lbl">إيداعات</div><div class="ms-val mv-g">${fmt(dep)}</div></div>
+      <div class="ms"><div class="ms-lbl">سحوبات</div><div class="ms-val mv-r">${fmt(wd)}</div></div>
+      <div class="ms"><div class="ms-lbl">الصافي</div><div class="ms-val mv-b">${fmt(dep-wd)}</div></div>
+      <div class="ms"><div class="ms-lbl">المعاملات</div><div class="ms-val mv-a">${txs.length}</div></div>
+    </div>
+    <div class="card tbl-wrap">
+      <table class="tbl">
+        <thead><tr><th>المساهم</th><th>النوع</th><th>المبلغ</th><th>التاريخ</th><th>ملاحظة</th></tr></thead>
+        <tbody>${[...txs].sort((a,b)=>new Date(b.date)-new Date(a.date)).map(t=>`<tr>
+          <td>${(getM(t.memberId)||{name:'محذوف'}).name.split(' ')[0]}</td>
+          <td><span class="badge ${t.type==='deposit'?'bg':'br'}">${t.type==='deposit'?'إيداع':'سحب'}</span></td>
+          <td style="font-weight:700;color:${t.type==='deposit'?'var(--green)':'var(--red)'}">${fmt(t.amount)}</td>
+          <td>${t.date}</td><td style="color:var(--text3)">${t.note||'-'}</td>
+        </tr>`).join('')||'<tr><td colspan="5" style="text-align:center;padding:16px;color:var(--text3)">لا توجد معاملات</td></tr>'}</tbody>
+      </table>
+    </div>`;
+}
+
+// ═══════════════════════════════════════════════
+//  WHATSAPP
+// ═══════════════════════════════════════════════
+function showWT(t,el){
+  document.querySelectorAll('#s-wa .tab-b').forEach(b=>b.classList.remove('act'));
+  el.classList.add('act');
+  ['wt-s','wt-st','wt-bc'].forEach(id=>document.getElementById(id).style.display=id===`wt-${t}`?'':'none');
+  if(t==='bc')genBC();
+}
+function setWT(type,el){
+  waTypeSelected=type;
+  document.querySelectorAll('#wt-s .tb').forEach(b=>b.className='tb');
+  el.className='tb '+(type==='deposit'?'sd':type==='withdraw'?'sw2':'');
+  document.getElementById('wa-ag').style.display=type==='balance'?'none':'';
+}
+function fillWASelects(preMid=null){
+  ['wa-m','wa-sm'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(el){el.innerHTML=M.map(m=>`<option value="${m.id}">${m.name}</option>`).join('');if(preMid)el.value=preMid;}
+  });
+}
+function buildWAMsg(m,type,amount,date,newBal){
+  const debt=newBal<0;
+  const lbl=type==='deposit'?'إيداع 💚':'سحب 🔴';
+  return`🏦 *الجمعية المالية الأسرية*\n━━━━━━━━━━━━━━━━\n✅ إشعار ${lbl}\n\n👤 المساهم: ${m.name}\n💰 المبلغ: ${fmt(amount)} ر.ع\n📅 التاريخ: ${date}\n${debt?`⚠️ الدين الحالي: ${fmt(Math.abs(newBal))} ر.ع`:`💼 الرصيد الحالي: ${fmt(newBal)} ر.ع`}\n━━━━━━━━━━━━━━━━\n🙏 شكراً لثقتك بنا\n_الجمعية المالية الأسرية_`;
+}
+function genWA(){
+  const mid=+document.getElementById('wa-m').value;
+  const amt=+document.getElementById('wa-amt').value||0;
+  const m=getM(mid);if(!m)return;
+  const s=stats(mid);let msg='';const d=today();
+  if(waTypeSelected==='balance'){
+    const debt=s.bal<0;
+    msg=`🏦 *الجمعية المالية الأسرية*\n━━━━━━━━━━━━━━━━\n💼 كشف الرصيد\n\n👤 ${m.name}\n📅 ${d}\n💚 الإيداعات: ${fmt(s.dep)} ر.ع\n🔴 السحوبات: ${fmt(s.wd)} ر.ع\n${debt?`⚠️ الدين: ${fmt(Math.abs(s.bal))} ر.ع`:`💰 الرصيد: ${fmt(s.bal)} ر.ع`}\n━━━━━━━━━━━━━━━━\n🙏 شكراً لثقتك بنا`;
+  }else{
+    const nb=waTypeSelected==='deposit'?s.bal+amt:s.bal-amt;
+    msg=buildWAMsg(m,waTypeSelected,amt,d,nb);
+  }
+  document.getElementById('wa-out').innerHTML=`<div class="wa-box">${msg.replace(/\n/g,'<br>')}</div><a href="https://wa.me/${m.phone}?text=${encodeURIComponent(msg)}" target="_blank" class="wa-btn"><i class="fab fa-whatsapp"></i> إرسال عبر واتساب</a>`;
+}
+function genStmt(){
+  const mid=+document.getElementById('wa-sm').value;
+  const m=getM(mid);if(!m)return;
+  const s=stats(mid);const debt=s.bal<0;
+  const rec=[...T.filter(t=>t.memberId===mid)].sort((a,b)=>new Date(b.date)-new Date(a.date)).slice(0,5);
+  const lines=rec.map(t=>`${t.type==='deposit'?'💚 إيداع':'🔴 سحب'} ${t.date} — ${fmt(t.amount)} ر.ع`).join('\n');
+  const msg=`🏦 *الجمعية المالية الأسرية*\n━━━━━━━━━━━━━━━━\n📋 كشف حساب شامل\n\n👤 ${m.name}\n📅 ${today()}\n━━━━━━━━━━━━━━━━\n💚 إجمالي الإيداعات: ${fmt(s.dep)} ر.ع\n🔴 إجمالي السحوبات: ${fmt(s.wd)} ر.ع\n${debt?`⚠️ الدين: ${fmt(Math.abs(s.bal))} ر.ع`:`💰 الرصيد: ${fmt(s.bal)} ر.ع`}\n━━━━━━━━━━━━━━━━\n📝 آخر المعاملات:\n${lines||'لا توجد معاملات'}\n━━━━━━━━━━━━━━━━\n🙏 شكراً لثقتك بنا`;
+  document.getElementById('wa-sout').innerHTML=`<div class="wa-box">${msg.replace(/\n/g,'<br>')}</div><a href="https://wa.me/${m.phone}?text=${encodeURIComponent(msg)}" target="_blank" class="wa-btn"><i class="fab fa-whatsapp"></i> إرسال لـ ${m.name.split(' ')[0]}</a>`;
+}
+function genBC(){
+  const d=today();
+  document.getElementById('wa-bclist').innerHTML=M.map(m=>{
+    const s=stats(m.id);const debt=s.bal<0;
+    const msg=`🏦 *الجمعية المالية الأسرية*\n━━━━━━━━━━━━━━━━\n💼 إشعار الرصيد الدوري\n\n👤 ${m.name}\n📅 ${d}\n${debt?`⚠️ الدين: ${fmt(Math.abs(s.bal))} ر.ع`:`💰 رصيدك: ${fmt(s.bal)} ر.ع`}\n━━━━━━━━━━━━━━━━\n🙏 شكراً لثقتك بنا`;
+    return`<div class="card" style="margin-bottom:9px;padding:12px 14px">
+      <div style="display:flex;align-items:center;gap:9px;margin-bottom:9px">
+        <div class="av" style="background:${m.color||COLORS[0]};width:34px;height:34px;font-size:13px">${ini(m.name)}</div>
+        <div><div style="font-weight:700;font-size:13px">${m.name}</div><div style="font-size:11px;color:var(--text3)">${m.phone}</div></div>
+        <div style="margin-right:auto;font-weight:800;color:${debt?'var(--red)':'var(--green)'};font-size:13px">${fmt(s.bal)} ر.ع</div>
+      </div>
+      <a href="https://wa.me/${m.phone}?text=${encodeURIComponent(msg)}" target="_blank" class="wa-btn" style="text-decoration:none"><i class="fab fa-whatsapp"></i> إرسال لـ ${m.name.split(' ')[0]}</a>
+    </div>`;
+  }).join('');
+}
+
+// ═══════════════════════════════════════════════
+//  SETTINGS
+// ═══════════════════════════════════════════════
+function renderSettings(){
+  const dep=T.filter(t=>t.type==='deposit' ).reduce((s,t)=>s+t.amount,0);
+  const wd =T.filter(t=>t.type==='withdraw').reduce((s,t)=>s+t.amount,0);
+  document.getElementById('cfg-m'  ).textContent=M.length;
+  document.getElementById('cfg-t'  ).textContent=T.length;
+  document.getElementById('cfg-bal').textContent=fmt(dep-wd)+' ر.ع';
+  updateFBStatus();
+}
+
+// ── Import / Export ──
+function exportJSON(){
+  const data=JSON.stringify({v:2,members:M,transactions:T,exported:today()},null,2);
+  const a=document.createElement('a');
+  a.href='data:application/json;charset=utf-8,'+encodeURIComponent(data);
+  a.download=`family-finance-backup-${today()}.json`;a.click();
+  toast('✅ تم تصدير النسخة الاحتياطية');
+}
+function exportCSV(){
+  let csv='\uFEFF#,المساهم,النوع,المبلغ,التاريخ,ملاحظة\n';
+  T.forEach((t,i)=>{
+    const m=getM(t.memberId);
+    csv+=`${i+1},"${m?m.name:'محذوف'}","${t.type==='deposit'?'إيداع':'سحب'}",${t.amount},"${t.date}","${t.note||''}"\n`;
+  });
+  const a=document.createElement('a');
+  a.href='data:text/csv;charset=utf-8,'+encodeURIComponent(csv);
+  a.download=`transactions-${today()}.csv`;a.click();
+  toast('✅ تم تصدير ملف CSV');
+}
+function importJSON(){document.getElementById('import-file').click();}
+async function handleImport(e){
+  const file=e.target.files[0];if(!file)return;
+  try{
+    const txt=await file.text();
+    const data=JSON.parse(txt);
+    if(!data.members||!data.transactions)throw new Error('تنسيق غير صحيح');
+    M=data.members; T=data.transactions;
+    nextMid=M.length?Math.max(...M.map(x=>x.id))+1:1;
+    nextTid=T.length?Math.max(...T.map(x=>x.id))+1:1;
+    await save();
+    renderHome(); renderSettings();
+    toast(`✅ تم الاستيراد: ${M.length} مساهم، ${T.length} معاملة`);
+  }catch(err){toast('⚠️ خطأ في الملف: '+err.message);}
+  e.target.value='';
+}
+
+// ── Reset ──
+async function doReset(){
+  // Delete from Firebase
+  if(isOnline&&db&&_fb.writeBatch){
+    try{
+      const batch=_fb.writeBatch(db);
+      const[ms,ts]=await Promise.all([
+        _fb.getDocs(_fb.collection(db,'members')),
+        _fb.getDocs(_fb.collection(db,'transactions'))
+      ]);
+      ms.forEach(d=>batch.delete(d.ref));
+      ts.forEach(d=>batch.delete(d.ref));
+      await batch.commit();
+    }catch(e){console.warn('Firebase reset error:',e);}
+  }
+  // Clear everything local
+  localStorage.clear();
+  closeSheet('ov-reset');
+  toast('✅ تم مسح جميع البيانات');
+  setTimeout(()=>location.reload(),1400);
+}
+
+// ═══════════════════════════════════════════════
+//  INIT
+// ═══════════════════════════════════════════════
+loadLocal();
+// No seed data — start clean
+document.getElementById('m-date').value=today();
+document.getElementById('t-date').value=today();
+fillTxMembers();
+buildYrBar();
+renderHome();
+if(!isOnline)document.getElementById('offline-bar').style.display='flex';
+
+// Register Service Worker
+if('serviceWorker' in navigator){
+  navigator.serviceWorker.register('sw.js')
+    .then(r=>console.log('SW:',r.scope))
+    .catch(e=>console.warn('SW:',e));
+}
+
+// Init Firebase in background
+initFirebase();
+</script>
+</body>
+</html>
